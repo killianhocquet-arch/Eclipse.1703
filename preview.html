@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview Desktop — AR Scene</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 100vw; height: 100vh; overflow: hidden; background: #1a1a2e; }
+    #info {
+      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.6); color: #fff; padding: 8px 16px;
+      border-radius: 20px; font-family: sans-serif; font-size: 13px;
+      z-index: 999; pointer-events: none;
+    }
+  </style>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+</head>
+<body>
+  <div id="info">Preview PC — Clic gauche: orbite | Molette: zoom | Clic droit: pan</div>
+
+  <a-scene background="color: #1a1a2e" cursor="rayOrigin: mouse">
+
+    <a-camera position="0 0.5 1.5" look-controls wasd-controls></a-camera>
+
+    <!-- Représentation de la bouteille (cylindre blanc = corps) -->
+    <a-cylinder color="#ddd" radius="0.15" height="0.7" position="0 0.35 0" opacity="0.3"></a-cylinder>
+
+    <!-- OBJET DE TEST — même contenu que dans experience.html -->
+    <a-cylinder color="red" radius="0.15" height="0.4" position="0 0.2 0"></a-cylinder>
+
+    <!-- Sol de référence -->
+    <a-plane color="#333" width="2" height="2" rotation="-90 0 0" position="0 0 0"></a-plane>
+
+    <!-- Lumières -->
+    <a-light type="ambient" intensity="0.6"></a-light>
+    <a-light type="directional" position="1 2 1" intensity="0.8"></a-light>
+
+  </a-scene>
+</body>
+</html>
