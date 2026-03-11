@@ -9,14 +9,12 @@
     body { width: 100vw; height: 100vh; overflow: hidden; }
   </style>
 
-  <!-- AR Libraries (ordre : synchrones en premier, engine async en dernier) -->
+  <!-- AR Libraries -->
   <script src="https://cdn.8thwall.com/web/aframe/8frame-1.3.0.min.js"></script>
   <script src="https://cdn.8thwall.com/web/xrextras/xrextras.js"></script>
-
-  <!-- 8th Wall Engine — async, data-preload-chunks précharge xr-slam.js (5.4MB) -->
   <script async src="engine/xr.js" data-preload-chunks="slam"></script>
 
-  <!-- Image Target Configuration — CYLINDRICAL pour étiquette bouteille -->
+  <!-- Image Target Configuration -->
   <script>
     const onxrloaded = () => {
       XR8.XrController.configure({
@@ -44,31 +42,30 @@
   </script>
 
   <script>
-    // Composant world-anchor :
-    // Quand la bouteille est détectée la 1ère fois, le contenu AR est placé
-    // dans l'espace monde (SLAM) — il reste stable même si on tourne autour.
-    AFRAME.registerComponent('world-anchor', {
+    // freeze-on-lost : quand l'étiquette sort du champ de vision,
+    // le contenu reste visible à sa dernière position connue.
+    // Pas de SLAM = pas de drift.
+    AFRAME.registerComponent('freeze-on-lost', {
       init: function () {
-        this.placed = false;
-        this.contentEl = document.querySelector('#ar-content');
+        this.el.addEventListener('xrimagelost', () => {
+          // Snapshot de la transform monde au moment de la perte
+          const worldPos = new THREE.Vector3();
+          const worldQuat = new THREE.Quaternion();
+          this.el.object3D.getWorldPosition(worldPos);
+          this.el.object3D.getWorldQuaternion(worldQuat);
 
-        this.el.addEventListener('xrimagefound', () => {
-          if (this.placed) return;
-
-          // Copie la position/rotation monde de l'image target
-          const src = this.el.object3D;
-          const dst = this.contentEl.object3D;
-
-          dst.position.copy(src.getWorldPosition(new THREE.Vector3()));
-          dst.quaternion.copy(src.getWorldQuaternion(new THREE.Quaternion()));
-          this.contentEl.setAttribute('visible', true);
-
-          this.placed = true;
-          console.log('[AR] Ancre posée — SLAM actif');
+          // Déplace les enfants vers la scène racine à cette position
+          const scene = this.el.sceneEl.object3D;
+          const children = [...this.el.object3D.children];
+          children.forEach(child => {
+            child.getWorldPosition(worldPos);
+            child.getWorldQuaternion(worldQuat);
+            scene.attach(child);          // reattach dans l'espace monde
+          });
         });
 
-        this.el.addEventListener('xrimagelost', () => {
-          console.log('[AR] Label hors vue — contenu maintenu par SLAM');
+        this.el.addEventListener('xrimagefound', () => {
+          console.log('[AR] Bouteille détectée');
         });
       }
     });
@@ -76,25 +73,20 @@
 </head>
 <body>
   <a-scene
-    xrweb="disableWorldTracking: false"
+    xrweb="disableWorldTracking: true"
     xrextras-gesture-detector
     xrextras-loading
     xrextras-runtime-error>
 
     <a-camera position="0 4 10"></a-camera>
 
-    <!-- Image target : détecte la bouteille, pose l'ancre, puis se décroche -->
-    <xrextras-named-image-target name="bouteille-eclipse" world-anchor>
-    </xrextras-named-image-target>
-
-    <!-- Contenu AR ancré dans l'espace monde via SLAM -->
-    <a-entity id="ar-content" visible="false">
+    <xrextras-named-image-target name="bouteille-eclipse" freeze-on-lost>
       <!-- DEBUG AXES — X=rouge, Y=vert, Z=bleu -->
       <a-box color="red"   width="0.3" height="0.02" depth="0.02" position="0.15 0 0"></a-box>
       <a-box color="green" width="0.02" height="0.3" depth="0.02" position="0 0.15 0"></a-box>
       <a-box color="blue"  width="0.02" height="0.02" depth="0.3" position="0 0 0.15"></a-box>
       <a-sphere color="white" radius="0.03" position="0 0 0"></a-sphere>
-    </a-entity>
+    </xrextras-named-image-target>
 
   </a-scene>
 </body>
