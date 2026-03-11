@@ -41,13 +41,35 @@
       });
     };
     window.XR8 ? onxrloaded() : window.addEventListener('xrloaded', onxrloaded);
+  </script>
 
-    // Debug : événements tracking
-    document.addEventListener('DOMContentLoaded', () => {
-      const target = document.querySelector('[name="bouteille-eclipse"]');
-      if (target) {
-        target.addEventListener('xrimagefound', () => console.log('[AR] Target détecté !'));
-        target.addEventListener('xrimagelost', () => console.log('[AR] Target perdu'));
+  <script>
+    // Composant world-anchor :
+    // Quand la bouteille est détectée la 1ère fois, le contenu AR est placé
+    // dans l'espace monde (SLAM) — il reste stable même si on tourne autour.
+    AFRAME.registerComponent('world-anchor', {
+      init: function () {
+        this.placed = false;
+        this.contentEl = document.querySelector('#ar-content');
+
+        this.el.addEventListener('xrimagefound', () => {
+          if (this.placed) return;
+
+          // Copie la position/rotation monde de l'image target
+          const src = this.el.object3D;
+          const dst = this.contentEl.object3D;
+
+          dst.position.copy(src.getWorldPosition(new THREE.Vector3()));
+          dst.quaternion.copy(src.getWorldQuaternion(new THREE.Quaternion()));
+          this.contentEl.setAttribute('visible', true);
+
+          this.placed = true;
+          console.log('[AR] Ancre posée — SLAM actif');
+        });
+
+        this.el.addEventListener('xrimagelost', () => {
+          console.log('[AR] Label hors vue — contenu maintenu par SLAM');
+        });
       }
     });
   </script>
@@ -61,13 +83,18 @@
 
     <a-camera position="0 4 10"></a-camera>
 
-    <xrextras-named-image-target name="bouteille-eclipse">
+    <!-- Image target : détecte la bouteille, pose l'ancre, puis se décroche -->
+    <xrextras-named-image-target name="bouteille-eclipse" world-anchor>
+    </xrextras-named-image-target>
+
+    <!-- Contenu AR ancré dans l'espace monde via SLAM -->
+    <a-entity id="ar-content" visible="false">
       <!-- DEBUG AXES — X=rouge, Y=vert, Z=bleu -->
       <a-box color="red"   width="0.3" height="0.02" depth="0.02" position="0.15 0 0"></a-box>
       <a-box color="green" width="0.02" height="0.3" depth="0.02" position="0 0.15 0"></a-box>
       <a-box color="blue"  width="0.02" height="0.02" depth="0.3" position="0 0 0.15"></a-box>
       <a-sphere color="white" radius="0.03" position="0 0 0"></a-sphere>
-    </xrextras-named-image-target>
+    </a-entity>
 
   </a-scene>
 </body>
