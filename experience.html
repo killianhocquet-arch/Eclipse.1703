@@ -86,9 +86,13 @@
         });
 
         target.addEventListener('xrimagelost', () => {
-          console.log('[AR] Séquence pause');
+          console.log('[AR] Target perdu — contenu figé en place');
           this.isTracking = false;
-          this.hideContent();
+          // xrextras force visible=false sur le target — on le re-force visible au frame suivant
+          requestAnimationFrame(() => {
+            target.object3D.visible = true;
+            this.el.object3D.visible = true;
+          });
           this.el.emit('ar-sequence-pause');
         });
       },
@@ -96,12 +100,6 @@
       showContent: function () {
         this.el.querySelectorAll('.ar-content').forEach(el => {
           el.setAttribute('visible', true);
-        });
-      },
-
-      hideContent: function () {
-        this.el.querySelectorAll('.ar-content').forEach(el => {
-          el.setAttribute('visible', false);
         });
       }
     });
