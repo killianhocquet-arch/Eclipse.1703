@@ -16,23 +16,34 @@
   <!-- 8th Wall Engine — async, data-preload-chunks précharge xr-slam.js (5.4MB) -->
   <script async src="engine/xr.js" data-preload-chunks="slam"></script>
 
-  <!-- Image Target Configuration — sera rempli avec les données réelles en Story 2.1 -->
+  <!-- Image Target Configuration -->
   <script>
     const onxrloaded = () => {
       XR8.XrController.configure({
-        imageTargetData: []
-        // TODO Story 2.1 : remplacer par les données du target Mount Gay Eclipse
-        // Exemple :
-        // imageTargetData: [{
-        //   "name": "mount-gay-bottle",
-        //   "type": "PLANAR",
-        //   "imagePath": "assets/Targets/[target-file].jpg",
-        //   "properties": { "left": 0, "top": 0, "width": 830, "height": 830,
-        //                   "originalWidth": 830, "originalHeight": 830, "isRotated": false }
-        // }]
+        imageTargetData: [
+          {
+            name: "bouteille-eclipse",
+            left: 0,
+            top: 0,
+            width: 1,
+            height: 1,
+            originalWidth: 595,
+            originalHeight: 842,
+            isRotated: false
+          }
+        ]
       });
     };
     window.XR8 ? onxrloaded() : window.addEventListener('xrloaded', onxrloaded);
+
+    // Debug : événements tracking
+    document.addEventListener('DOMContentLoaded', () => {
+      const target = document.querySelector('[name="bouteille-eclipse"]');
+      if (target) {
+        target.addEventListener('xrimagefound', () => console.log('[AR] Target détecté !'));
+        target.addEventListener('xrimagelost', () => console.log('[AR] Target perdu'));
+      }
+    });
   </script>
 </head>
 <body>
@@ -45,7 +56,10 @@
 
     <a-camera position="0 4 10"></a-camera>
 
-    <!-- Contenu AR sera ajouté ici dans les stories suivantes -->
+    <xrextras-named-image-target name="bouteille-eclipse">
+      <!-- OBJET DE TEST — à supprimer après validation tracking (Story 2.2) -->
+      <a-box color="red" scale="0.3 0.3 0.3" position="0 0.15 0"></a-box>
+    </xrextras-named-image-target>
 
   </a-scene>
 </body>
