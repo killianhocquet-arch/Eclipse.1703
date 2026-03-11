@@ -16,20 +16,26 @@
   <!-- 8th Wall Engine — async, data-preload-chunks précharge xr-slam.js (5.4MB) -->
   <script async src="engine/xr.js" data-preload-chunks="slam"></script>
 
-  <!-- Image Target Configuration -->
+  <!-- Image Target Configuration — CYLINDRICAL pour étiquette bouteille -->
   <script>
     const onxrloaded = () => {
       XR8.XrController.configure({
         imageTargetData: [
           {
-            name: "bouteille-eclipse",
-            left: 0,
-            top: 0,
-            width: 1,
-            height: 1,
-            originalWidth: 595,
-            originalHeight: 842,
-            isRotated: false
+            "name": "bouteille-eclipse",
+            "type": "CYLINDRICAL",
+            "imagePath": "assets/Targets/Target_bouteille_eclipse.jpg",
+            "properties": {
+              "left": 0,
+              "top": 0,
+              "width": 595,
+              "height": 842,
+              "originalWidth": 595,
+              "originalHeight": 842,
+              "isRotated": false,
+              "arcStartRad": 0,
+              "arcLengthRad": 2.094
+            }
           }
         ]
       });
