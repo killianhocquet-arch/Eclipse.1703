@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>08 — Gaussian Splat</title>
+
+  <!-- AR Libraries -->
+  <script src="https://cdn.8thwall.com/web/aframe/8frame-1.3.0.min.js"></script>
+  <script src="https://cdn.8thwall.com/web/xrextras/xrextras.js"></script>
+
+  <!-- Polyfills: bridge Three.js r137 (8frame) → r141+ API renames used by spark.js.
+       Also build a dynamic import map so spark.js resolves bare "three" imports
+       to the global THREE already loaded by 8frame (avoids dual-instance crash). -->
+  <script>
+    (function () {
+      // r141 renames — old names still exist in r137
+      if (!THREE.Data3DTexture && THREE.DataTexture3D) {
+        THREE.Data3DTexture = THREE.DataTexture3D;
+      }
+      if (!THREE.DataArrayTexture && THREE.DataTexture2DArray) {
+        THREE.DataArrayTexture = THREE.DataTexture2DArray;
+      }
+
+      // Matrix2 was added in r152 — spark.js uses it for shader uniforms
+      if (!THREE.Matrix2) {
+        THREE.Matrix2 = function Matrix2(n11, n12, n21, n22) {
+          this.elements = [1, 0, 0, 1];
+          if (n11 !== undefined) { this.set(n11, n12, n21, n22); }
+        };
+        THREE.Matrix2.prototype.isMatrix2 = true;
+        THREE.Matrix2.prototype.set = function (n11, n12, n21, n22) {
+          var e = this.elements;
+          e[0] = n11; e[2] = n12;
+          e[1] = n21; e[3] = n22;
+          return this;
+        };
+        THREE.Matrix2.prototype.identity = function () {
+          this.set(1, 0, 0, 1); return this;
+        };
+        THREE.Matrix2.prototype.copy = function (m) {
+          var s = m.elements; this.set(s[0], s[2], s[1], s[3]); return this;
+        };
+        THREE.Matrix2.prototype.clone = function () {
+          var e = this.elements;
+          return new THREE.Matrix2(e[0], e[2], e[1], e[3]);
+        };
+      }
+
+      // Build ES-module shim that re-exports every key on window.THREE
+      var keys = Object.keys(window.THREE).filter(function (k) {
+        return /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(k);
+      });
+      var code = keys.map(function (k) {
+        return 'export const ' + k + ' = window.THREE["' + k + '"];';
+      }).join('\n') + '\nexport default window.THREE;\n';
+      var blob = new Blob([code], {type: 'text/javascript'});
+      var url = URL.createObjectURL(blob);
+
+      var map = document.createElement('script');
+      map.type = 'importmap';
+      map.textContent = JSON.stringify({imports: {'three': url}});
+      document.currentScript.after(map);
+    })();
+  </script>
+
+  <!-- 8th Wall Engine -->
+  <script async src="../engine/xr.js" data-preload-chunks="slam"></script>
+
+  <!-- Image Target Configuration -->
+    <script>
+    const onxrloaded = () => {
+      XR8.XrController.configure({
+        imageTargetData:[{
+          "name": "my-poster",
+          "type": "PLANAR",
+          "imagePath": "../assets/Targets/Target_1000055040.jpg",
+          "properties": {
+            "left": 0, "top": 0,
+            "width": 830, "height": 830,
+            "originalWidth": 830, "originalHeight": 830,
+            "isRotated": false
+          }
+        }]
+      });
+    };
+    window.XR8 ? onxrloaded() : window.addEventListener('xrloaded', onxrloaded);
+  </script>
+
+  <!-- Custom component: loads a Gaussian Splat via spark.js.
+       Spark.js is a 3DGS renderer for THREE.js that supports
+       .sog, .splat, .ply, .spz, and .ksplat file formats.
+       Using esm.sh with ?external=three so spark.js uses the
+       global THREE from 8frame instead of bundling its own copy. -->
+  <script>
+    AFRAME.registerComponent('spark-splat', {
+      schema: {
+        src: {type: 'string'}
+      },
+      init: async function () {
+        try {
+          var Spark = await import('https://esm.sh/@sparkjsdev/spark?external=three');
+          this.splat = new Spark.SplatMesh({url: this.data.src});
+          this.el.object3D.add(this.splat);
+        } catch (err) {
+          console.error('Failed to load Gaussian splat:', err);
+        }
+      },
+      remove: function () {
+        if (this.splat) {
+          this.el.object3D.remove(this.splat);
+          this.splat.dispose();
+        }
+      }
+    });
+  </script>
+</head>
+<body>
+  <a-scene
+    xrextras-gesture-detector
+    xrextras-almost-there
+    xrextras-loading
+    xrextras-runtime-error
+    vr-mode-ui="enabled: false"
+    xrweb="disableWorldTracking: true">
+
+    <!-- Preload the splat file so it is cached before the component loads it -->
+    <a-assets>
+      <a-asset-item id="splat" src="../assets/splat_30000.sog"></a-asset-item>
+    </a-assets>
+
+    <a-camera position="0 4 10"></a-camera>
+
+    <xrextras-named-image-target name="my-poster">
+
+      <!-- Gaussian Splat — replace src with your own .sog / .splat / .ply file
+           Scale is critical: splat scenes are often real-world scale
+           and need significant scaling down to fit on an image target -->
+      <a-entity spark-splat="src: ../assets/splat_30000.sog"
+                position="0 0.5 0"
+                scale="0.3 0.3 0.3">
+      </a-entity>
+
+    </xrextras-named-image-target>
+
+  </a-scene>
+</body>
+</html>
