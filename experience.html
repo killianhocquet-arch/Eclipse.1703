@@ -62,8 +62,11 @@
     <a-camera position="0 4 10"></a-camera>
 
     <xrextras-named-image-target name="bouteille-eclipse">
-      <!-- OBJET DE TEST — à supprimer après validation tracking (Story 2.2) -->
-      <a-cylinder color="red" radius="0.04" height="0.15" position="0 0 0" rotation="-90 0 0"></a-cylinder>
+      <!-- DEBUG AXES — X=rouge, Y=vert, Z=bleu -->
+      <a-box color="red"   width="0.3" height="0.02" depth="0.02" position="0.15 0 0"></a-box>
+      <a-box color="green" width="0.02" height="0.3" depth="0.02" position="0 0.15 0"></a-box>
+      <a-box color="blue"  width="0.02" height="0.02" depth="0.3" position="0 0 0.15"></a-box>
+      <a-sphere color="white" radius="0.03" position="0 0 0"></a-sphere>
     </xrextras-named-image-target>
 
   </a-scene>
