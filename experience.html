@@ -35,72 +35,59 @@
   </script>
 
   <script>
-    // smooth-target : lerp/slerp pour absorber les tremblements de tracking
-    AFRAME.registerComponent('smooth-target', {
-      schema: { factor: { default: 0.05 } },
-      init: function () {
-        this.smoothPos = new THREE.Vector3();
-        this.smoothQuat = new THREE.Quaternion();
-        this.initialized = false;
-        this.el.addEventListener('xrimagefound', () => {
-          if (!this.initialized) {
-            this.smoothPos.copy(this.el.object3D.position);
-            this.smoothQuat.copy(this.el.object3D.quaternion);
-            this.initialized = true;
-          }
-        });
-      },
-      tick: function () {
-        if (!this.initialized) return;
-        const f = this.data.factor;
-        this.smoothPos.lerp(this.el.object3D.position, f);
-        this.smoothQuat.slerp(this.el.object3D.quaternion, f);
-        this.el.object3D.position.copy(this.smoothPos);
-        this.el.object3D.quaternion.copy(this.smoothQuat);
-      }
-    });
-
     /**
-     * ar-sequence-controller
-     * Gère le cycle de vie de la scène AR :
-     *   - xrimagefound → montre .ar-content, émet 'ar-sequence-start'
-     *   - xrimagelost  → cache .ar-content, émet 'ar-sequence-pause'
-     * Chaque nouvelle détection repart depuis le début (séquence courte 5-10 sec).
+     * ar-anchor
+     * Stratégie : le contenu AR (#ar-content) est une entité indépendante dans la scène.
+     * - xrimagefound / xrimageupdated → lerp position vers le target (smooth)
+     * - xrimagelost → ne fait rien, #ar-content reste visible à la dernière position
      *
-     * Events émis sur this.el :
-     *   'ar-sequence-start'  — reçu par les composants d'animation de l'Epic 3
-     *   'ar-sequence-pause'  — permet de mettre en pause les animations
+     * Le contenu n'est PAS enfant de xrextras-named-image-target, donc
+     * xrextras ne peut pas le cacher quand le target est perdu.
      */
-    AFRAME.registerComponent('ar-sequence-controller', {
+    AFRAME.registerComponent('ar-anchor', {
+      schema: { factor: { default: 0.05 } },
+
       init: function () {
-        this.isTracking = false;
+        this.content = null;
+        this.tracking = false;
+        this._pos = new THREE.Vector3();
+        this._quat = new THREE.Quaternion();
 
-        // Le target parent (xrextras-named-image-target)
-        const target = this.el.parentEl;
-
-        target.addEventListener('xrimagefound', () => {
-          console.log('[AR] Séquence start');
-          this.isTracking = true;
-          this.showContent();
-          this.el.emit('ar-sequence-start');
+        this.el.addEventListener('xrimagefound', (e) => {
+          if (!this.content) {
+            this.content = document.querySelector('#ar-content');
+          }
+          // Initialise la position immédiatement depuis event.detail
+          const p = e.detail.position;
+          const r = e.detail.rotation;
+          this.content.object3D.position.set(p.x, p.y, p.z);
+          this.content.object3D.quaternion.set(r.x, r.y, r.z, r.w);
+          this.content.setAttribute('visible', true);
+          this.tracking = true;
+          this.content.emit('ar-sequence-start');
+          console.log('[AR] found');
         });
 
-        target.addEventListener('xrimagelost', () => {
-          console.log('[AR] Target perdu — contenu figé en place');
-          this.isTracking = false;
-          // xrextras force visible=false sur le target — on le re-force visible au frame suivant
-          requestAnimationFrame(() => {
-            target.object3D.visible = true;
-            this.el.object3D.visible = true;
-          });
-          this.el.emit('ar-sequence-pause');
+        this.el.addEventListener('xrimageupdated', (e) => {
+          // Mise à jour position chaque frame pendant le tracking
+          const p = e.detail.position;
+          const r = e.detail.rotation;
+          this._pos.set(p.x, p.y, p.z);
+          this._quat.set(r.x, r.y, r.z, r.w);
+        });
+
+        this.el.addEventListener('xrimagelost', () => {
+          // Ne rien faire — le contenu reste figé à la dernière position
+          this.tracking = false;
+          console.log('[AR] lost — frozen');
         });
       },
 
-      showContent: function () {
-        this.el.querySelectorAll('.ar-content').forEach(el => {
-          el.setAttribute('visible', true);
-        });
+      tick: function () {
+        if (!this.tracking || !this.content) return;
+        const f = this.data.factor;
+        this.content.object3D.position.lerp(this._pos, f);
+        this.content.object3D.quaternion.slerp(this._quat, f);
       }
     });
   </script>
@@ -114,18 +101,17 @@
 
     <a-camera position="0 4 10"></a-camera>
 
-    <xrextras-named-image-target name="bouteille-eclipse" smooth-target="factor: 0.05">
-
-      <a-entity ar-sequence-controller>
-
-        <!-- DEBUG AXES (remplacés en Epic 3) -->
-        <a-box class="ar-content" color="red"   width="0.3" height="0.02" depth="0.02" position="0.15 0 0" visible="false"></a-box>
-        <a-box class="ar-content" color="green" width="0.02" height="0.3" depth="0.02" position="0 0.15 0" visible="false"></a-box>
-        <a-box class="ar-content" color="blue"  width="0.02" height="0.02" depth="0.3" position="0 0 0.15" visible="false"></a-box>
-        <a-sphere class="ar-content" color="white" radius="0.03" position="0 0 0" visible="false"></a-sphere>
-
-      </a-entity>
+    <!-- Target vide : détecte uniquement, ne gère pas la visibilité du contenu -->
+    <xrextras-named-image-target name="bouteille-eclipse" ar-anchor="factor: 0.05">
     </xrextras-named-image-target>
+
+    <!-- Contenu AR indépendant — xrextras ne peut pas le cacher -->
+    <a-entity id="ar-content" visible="false">
+      <a-box class="ar-content" color="red"   width="0.3" height="0.02" depth="0.02" position="0.15 0 0"></a-box>
+      <a-box class="ar-content" color="green" width="0.02" height="0.3" depth="0.02" position="0 0.15 0"></a-box>
+      <a-box class="ar-content" color="blue"  width="0.02" height="0.02" depth="0.3" position="0 0 0.15"></a-box>
+      <a-sphere class="ar-content" color="white" radius="0.03" position="0 0 0"></a-sphere>
+    </a-entity>
 
   </a-scene>
 </body>
