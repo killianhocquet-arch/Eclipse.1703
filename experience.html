@@ -33,6 +33,36 @@
     };
     window.XR8 ? onxrloaded() : window.addEventListener('xrloaded', onxrloaded);
   </script>
+
+  <script>
+    // smooth-target : lerp position + slerp rotation à chaque frame
+    // xrextras pose la valeur brute → on lisse vers elle
+    // factor: 0.0 = ultra lent, 1.0 = pas de lissage. 0.2 = fluide pour démo
+    AFRAME.registerComponent('smooth-target', {
+      schema: { factor: { default: 0.2 } },
+      init: function () {
+        this.smoothPos = new THREE.Vector3();
+        this.smoothQuat = new THREE.Quaternion();
+        this.initialized = false;
+
+        this.el.addEventListener('xrimagefound', () => {
+          if (!this.initialized) {
+            this.smoothPos.copy(this.el.object3D.position);
+            this.smoothQuat.copy(this.el.object3D.quaternion);
+            this.initialized = true;
+          }
+        });
+      },
+      tick: function () {
+        if (!this.initialized) return;
+        const f = this.data.factor;
+        this.smoothPos.lerp(this.el.object3D.position, f);
+        this.smoothQuat.slerp(this.el.object3D.quaternion, f);
+        this.el.object3D.position.copy(this.smoothPos);
+        this.el.object3D.quaternion.copy(this.smoothQuat);
+      }
+    });
+  </script>
 </head>
 <body>
   <a-scene
@@ -43,7 +73,7 @@
 
     <a-camera position="0 4 10"></a-camera>
 
-    <xrextras-named-image-target name="bouteille-eclipse">
+    <xrextras-named-image-target name="bouteille-eclipse" smooth-target="factor: 0.2">
       <!-- DEBUG AXES — X=rouge, Y=vert, Z=bleu -->
       <a-box color="red"   width="0.3" height="0.02" depth="0.02" position="0.15 0 0"></a-box>
       <a-box color="green" width="0.02" height="0.3" depth="0.02" position="0 0.15 0"></a-box>
