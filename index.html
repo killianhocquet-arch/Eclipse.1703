@@ -1,132 +1,762 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>A-Frame + 8th Wall Examples</title>
+  <title>Mount Gay Eclipse — Est. 1703</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    :root {
+      --navy:  #060e1a;
+      --gold:  #c9a84c;
+      --cream: #ede6d6;
+      --dim:   rgba(237,230,214,0.38);
+    }
+
+    html { scroll-behavior: auto; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0d1117;
-      color: #e6edf3;
-      min-height: 100vh;
-      padding: 2rem;
+      background: var(--navy);
+      color: var(--cream);
+      font-family: 'Cormorant Garamond', serif;
+      overflow-x: hidden;
     }
 
-    h1 {
+    /* ─── Canvas ──────────────────────────────────── */
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+    canvas { display: block; }
+
+    /* ─── Grain ───────────────────────────────────── */
+    .grain {
+      position: fixed;
+      inset: -50%;
+      width: 200%;
+      height: 200%;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain-shift 0.5s steps(1) infinite;
+    }
+    @keyframes grain-shift {
+      0%   { transform: translate(0,   0);   }
+      25%  { transform: translate(-2%, -1%); }
+      50%  { transform: translate(1%,  2%);  }
+      75%  { transform: translate(2%, -2%);  }
+      100% { transform: translate(-1%, 1%);  }
+    }
+
+    /* ─── Loading ─────────────────────────────────── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 3rem 3.5rem;
+      transition: opacity 0.9s ease;
+    }
+    #loader .loader-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+      opacity: 0.7;
+    }
+    #loader .loader-counter {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 18vw, 14rem);
+      line-height: 0.85;
+      color: var(--cream);
+      letter-spacing: -0.02em;
+    }
+    #loader .loader-line {
+      position: absolute;
+      bottom: 3rem;
+      right: 3.5rem;
+      width: 0%;
+      height: 1px;
+      background: var(--gold);
+      transition: width 0.3s ease;
+    }
+    #loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ─── Nav ─────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 2.2rem 3rem;
+      pointer-events: none;
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.3em;
+      line-height: 1.8;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+    .nav-logo span {
+      color: var(--gold);
+      font-size: 0.6rem;
+      letter-spacing: 0.45em;
+    }
+    .nav-right {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-align: right;
+      line-height: 2;
+      opacity: 0.4;
+      font-style: italic;
+    }
+
+    /* ─── Scroll container ────────────────────────── */
+    #scroll-container {
+      position: relative;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .section {
+      height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ─── Section 1 · Hero ────────────────────────── */
+    #hero { overflow: hidden; }
+
+    /* Texte fantôme derrière la bouteille */
+    .hero-ghost {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(8rem, 28vw, 26rem);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(201,168,76,0.08);
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+    }
+
+    /* Labels périphériques */
+    .hero-top-left {
+      position: absolute;
+      top: 6.5rem;
+      left: 3rem;
+    }
+    .hero-top-left h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      line-height: 1;
+      letter-spacing: 0.05em;
+      color: var(--cream);
+    }
+    .hero-top-left h1 span { color: var(--gold); }
+
+    .hero-top-right {
+      position: absolute;
+      top: 6.5rem;
+      right: 3rem;
+      text-align: right;
+    }
+    .hero-top-right p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      line-height: 2.2;
+      opacity: 0.4;
+    }
+
+    .hero-bottom-left {
+      position: absolute;
+      bottom: 3rem;
+      left: 3rem;
+    }
+    .hero-bottom-left p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      opacity: 0.3;
+      font-style: italic;
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2.8rem;
+      right: 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .scroll-indicator span {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.55rem;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      opacity: 0.3;
+      writing-mode: vertical-rl;
+    }
+    .scroll-indicator::after {
+      content: '';
+      display: block;
+      width: 1px;
+      height: 50px;
+      background: var(--gold);
+      opacity: 0.25;
+    }
+
+    /* ─── Section 2 · Origins ─────────────────────── */
+    #origins .content {
+      text-align: left;
+      padding: 0 3rem;
+      width: 100%;
+    }
+    .origins-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.55em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .origins-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 20vw, 18rem);
+      line-height: 0.82;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      color: var(--cream);
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    .origins-meta {
+      display: flex;
+      align-items: flex-start;
+      gap: 3rem;
+      margin-top: 2rem;
+    }
+    .origins-coords {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.35em;
+      color: var(--gold);
+      font-style: italic;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    .origins-body {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      line-height: 2;
+      color: var(--dim);
+      opacity: 0;
+      transform: translateY(16px);
+      max-width: 320px;
+    }
+
+    /* ─── Section 3 · Heritage ────────────────────── */
+    #heritage .content {
+      text-align: right;
+      padding: 0 3rem;
+      width: 100%;
+    }
+    .heritage-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.55em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .heritage-year {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 22vw, 20rem);
+      line-height: 0.82;
+      letter-spacing: 0.01em;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(201,168,76,0.35);
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    .heritage-body {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.9rem;
+      font-style: italic;
+      letter-spacing: 0.05em;
+      line-height: 2;
+      color: var(--dim);
+      opacity: 0;
+      transform: translateY(16px);
+      max-width: 340px;
+      margin-left: auto;
+      margin-top: 1.5rem;
+    }
+
+    /* ─── Section 4 · Eclipse ─────────────────────── */
+    #eclipse-section .content {
       text-align: center;
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
+      width: 100%;
+      padding: 0 1rem;
     }
-
-    .subtitle {
-      text-align: center;
-      color: #8b949e;
-      margin-bottom: 2.5rem;
+    .eclipse-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.55em;
+      color: var(--gold);
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(20px);
     }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.25rem;
-      max-width: 960px;
-      margin: 0 auto;
+    .eclipse-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(6rem, 26vw, 24rem);
+      line-height: 0.8;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(50px);
+      background: linear-gradient(150deg, #ede6d6 0%, #c9a84c 45%, #7a4e18 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-
-    .card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 1.5rem;
-      text-decoration: none;
-      color: inherit;
-      transition: border-color 0.2s, transform 0.2s;
+    .eclipse-sub {
+      margin-top: 1.8rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.75rem;
+      font-style: italic;
+      letter-spacing: 0.4em;
+      opacity: 0;
+      transform: translateY(16px);
+      color: var(--dim);
     }
-
-    .card:hover {
-      border-color: #58a6ff;
-      transform: translateY(-2px);
-    }
-
-    .card-number {
+    .eclipse-cta {
       display: inline-block;
-      background: #58a6ff;
-      color: #0d1117;
-      font-weight: 700;
-      font-size: 0.85rem;
-      width: 2rem;
-      height: 2rem;
-      line-height: 2rem;
-      text-align: center;
-      border-radius: 6px;
-      margin-bottom: 0.75rem;
+      margin-top: 3rem;
+      padding: 1rem 3rem;
+      border: 1px solid rgba(201,168,76,0.4);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0;
+      transform: translateY(16px);
+      pointer-events: auto;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+    }
+    .eclipse-cta:hover {
+      background: var(--gold);
+      color: var(--navy);
     }
 
-    .card-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 0.4rem;
-    }
-
-    .card-path {
-      font-size: 0.8rem;
-      color: #8b949e;
-      font-family: monospace;
+    /* ─── Horizontal rule ─────────────────────────── */
+    .section-hr {
+      position: absolute;
+      bottom: 0; left: 3rem; right: 3rem;
+      height: 1px;
+      background: rgba(201,168,76,0.12);
     }
   </style>
 </head>
 <body>
-  <h1>A-Frame + 8th Wall Examples</h1>
-  <p class="subtitle">Click a card to open the example</p>
 
-  <div class="grid">
-    <a class="card" href="examples/01_primitives.html">
-      <span class="card-number">01</span>
-      <div class="card-title">Primitives</div>
-      <div class="card-path">examples/01_primitives.html</div>
-    </a>
-    <a class="card" href="examples/02_text_msdf.html">
-      <span class="card-number">02</span>
-      <div class="card-title">Text MSDF</div>
-      <div class="card-path">examples/02_text_msdf.html</div>
-    </a>
-    <a class="card" href="examples/03_images.html">
-      <span class="card-number">03</span>
-      <div class="card-title">Images</div>
-      <div class="card-path">examples/03_images.html</div>
-    </a>
-    <a class="card" href="examples/04_3d_models.html">
-      <span class="card-number">04</span>
-      <div class="card-title">3D Models</div>
-      <div class="card-path">examples/04_3d_models.html</div>
-    </a>
-    <a class="card" href="examples/05_video_chroma.html">
-      <span class="card-number">05</span>
-      <div class="card-title">Video Chroma</div>
-      <div class="card-path">examples/05_video_chroma.html</div>
-    </a>
-    <a class="card" href="examples/06_audio.html">
-      <span class="card-number">06</span>
-      <div class="card-title">Audio</div>
-      <div class="card-path">examples/06_audio.html</div>
-    </a>
-    <a class="card" href="examples/07_p5js.html">
-      <span class="card-number">07</span>
-      <div class="card-title">p5.js</div>
-      <div class="card-path">examples/07_p5js.html</div>
-    </a>
-    <a class="card" href="examples/08_gaussian_splat.html">
-      <span class="card-number">08</span>
-      <div class="card-title">Gaussian Splat</div>
-      <div class="card-path">examples/08_gaussian_splat.html</div>
-    </a>
-    <a class="card" href="examples/09_multi_targets.html">
-      <span class="card-number">09</span>
-      <div class="card-title">Multi Targets</div>
-      <div class="card-path">examples/09_multi_targets.html</div>
-    </a>
+<!-- Loading -->
+<div id="loader">
+  <div class="loader-eyebrow">Mount Gay · Eclipse · Est. 1703</div>
+  <div class="loader-counter" id="loader-counter">0</div>
+  <div class="loader-line" id="loader-line"></div>
+</div>
+
+<!-- Canvas Three.js -->
+<div id="canvas-container">
+  <canvas id="three-canvas"></canvas>
+</div>
+
+<!-- Grain -->
+<div class="grain"></div>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-logo">
+    Mount Gay<br>
+    <span>Barbados Rum</span>
   </div>
+  <div class="nav-right">
+    Est. 1703<br>
+    Eclipse<br>
+    Heritage Blend
+  </div>
+</nav>
+
+<!-- Scroll content -->
+<div id="scroll-container">
+
+  <!-- Hero -->
+  <section class="section" id="hero">
+    <!-- Ghost text derrière la bouteille -->
+    <div class="hero-ghost">ECLIPSE</div>
+
+    <!-- Labels périphériques -->
+    <div class="hero-top-left">
+      <h1>Mount <span>Gay</span></h1>
+    </div>
+    <div class="hero-top-right">
+      <p>Est. 1703</p>
+      <p>Eclipse</p>
+      <p>Barbados Rum</p>
+    </div>
+    <div class="hero-bottom-left">
+      <p>The World's Oldest Rum Distillery</p>
+    </div>
+    <div class="scroll-indicator"><span>Scroll</span></div>
+    <div class="section-hr"></div>
+  </section>
+
+  <!-- Origins -->
+  <section class="section" id="origins">
+    <div class="content">
+      <div class="origins-eyebrow" id="origins-eyebrow">The Birthplace of Rum</div>
+      <h2 class="origins-title" id="origins-title">Barbados</h2>
+      <div class="origins-meta">
+        <div class="origins-coords" id="origins-coords">13°10'N · 59°32'W</div>
+        <div class="origins-body" id="origins-body">
+          The island that gave birth to rum.<br>
+          Over 320 years of uninterrupted distillation.
+        </div>
+      </div>
+    </div>
+    <div class="section-hr"></div>
+  </section>
+
+  <!-- Heritage -->
+  <section class="section" id="heritage">
+    <div class="content">
+      <div class="heritage-eyebrow" id="heritage-eyebrow">Unbroken Since</div>
+      <h2 class="heritage-year" id="heritage-year">1703</h2>
+      <div class="heritage-body" id="heritage-body">
+        From the coral-limestone soils of Barbados,<br>
+        a legacy distilled through centuries.
+      </div>
+    </div>
+    <div class="section-hr"></div>
+  </section>
+
+  <!-- Eclipse -->
+  <section class="section" id="eclipse-section">
+    <div class="content">
+      <div class="eclipse-eyebrow" id="eclipse-eyebrow">Mount Gay · Barbados</div>
+      <h2 class="eclipse-title" id="eclipse-title">Eclipse</h2>
+      <div class="eclipse-sub" id="eclipse-sub">Crafted for those who seek the extraordinary</div>
+      <a class="eclipse-cta" id="eclipse-cta" href="experience.html">Discover the AR Experience</a>
+    </div>
+  </section>
+
+</div>
+
+<!-- Scripts (synchrones — doivent être disponibles avant le module) -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
+gsap.registerPlugin(ScrollTrigger);
+
+// ─── LENIS SMOOTH SCROLL ──────────────────────────────────────────
+const lenis = new Lenis({ lerp: 0.08, smoothWheel: true });
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+gsap.ticker.lagSmoothing(0);
+
+// ─── RENDERER ────────────────────────────────────────────────────
+const canvas  = document.getElementById('three-canvas');
+const W = () => window.innerWidth;
+const H = () => window.innerHeight;
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(W(), H());
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.4;
+
+const scene = new THREE.Scene();
+const cam = new THREE.PerspectiveCamera(40, W() / H(), 0.1, 100);
+cam.position.set(0, 0, 5);
+
+// ─── BACKGROUND SHADER — BLEU NUIT + HALO AMBRE ──────────────────
+const bgMat = new THREE.ShaderMaterial({
+  depthWrite: false,
+  uniforms: {
+    uProgress: { value: 0.0 },
+    uTime:     { value: 0.0 },
+    uRes:      { value: new THREE.Vector2(W(), H()) },
+  },
+  vertexShader: `void main() { gl_Position = vec4(position.xy, 1.0, 1.0); }`,
+  fragmentShader: `
+    uniform float uProgress;
+    uniform float uTime;
+    uniform vec2  uRes;
+
+    // Palette bleu nuit profond
+    vec3 c0 = vec3(0.024, 0.043, 0.078);  // bleu nuit base
+    vec3 c1 = vec3(0.018, 0.032, 0.065);  // bleu nuit plus sombre
+    vec3 c2 = vec3(0.028, 0.050, 0.090);  // bleu nuit légèrement plus clair
+
+    // Halos ambre / or doux
+    vec3 g0 = vec3(0.200, 0.130, 0.030);  // halo ambre sombre
+    vec3 g1 = vec3(0.120, 0.090, 0.020);  // halo or subtil
+    vec3 g2 = vec3(0.260, 0.160, 0.035);  // halo ambre plus chaud
+
+    void main() {
+      vec2 uv = gl_FragCoord.xy / uRes;
+      vec2 p  = uv - vec2(0.5, 0.38);
+      float d = length(p);
+
+      float breathe = sin(uTime * 0.35) * 0.035 + 1.0;
+
+      float t = clamp(uProgress, 0.0, 1.0);
+      float s = clamp(uProgress - 1.0, 0.0, 1.0);
+
+      vec3 bg   = mix(mix(c0, c1, t), c2, s);
+      vec3 glow = mix(mix(g0, g1, t), g2, s);
+
+      float halo = (1.0 - smoothstep(0.0, 0.90 * breathe, d)) * 0.45;
+      vec3 col = bg + glow * halo;
+
+      // Vignette
+      float vig = 1.0 - smoothstep(0.45, 1.2, length(uv - 0.5));
+      col *= vig;
+
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `
+});
+const bgMesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat);
+bgMesh.renderOrder = -1;
+scene.add(bgMesh);
+
+// ─── LIGHTING ─────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0xd0c0a0, 0.4));
+
+const key = new THREE.DirectionalLight(0xffd060, 3.5);
+key.position.set(2, 3, 4);
+scene.add(key);
+
+const fill = new THREE.DirectionalLight(0x2040a0, 0.8);
+fill.position.set(-3, 0, 1);
+scene.add(fill);
+
+const rim = new THREE.DirectionalLight(0xffb020, 2.2);
+rim.position.set(0.5, -3, -2);
+scene.add(rim);
+
+// ─── BOTTLE ───────────────────────────────────────────────────────
+let bottle = null;
+const clock = new THREE.Clock();
+const scrollState = { rotY: 0, posY: 0 };
+
+const OBJ_BASE = 'assets/Meshy_AI_Whiskey_Bottle_0312102948_texture_obj/';
+const OBJ_NAME = 'Meshy_AI_Whiskey_Bottle_0312102948_texture';
+
+const mtlLoader = new MTLLoader();
+mtlLoader.setPath(OBJ_BASE);
+mtlLoader.load(OBJ_NAME + '.mtl', (materials) => {
+  materials.preload();
+
+  const objLoader = new OBJLoader();
+  objLoader.setMaterials(materials);
+  objLoader.setPath(OBJ_BASE);
+  objLoader.load(
+    OBJ_NAME + '.obj',
+    (obj) => {
+      bottle = obj;
+
+      const box  = new THREE.Box3().setFromObject(bottle);
+      const size = box.getSize(new THREE.Vector3());
+      const ctr  = box.getCenter(new THREE.Vector3());
+      const sc   = 2.8 / Math.max(size.x, size.y, size.z);
+
+      bottle.scale.setScalar(sc);
+      bottle.position.copy(ctr.multiplyScalar(-sc));
+
+      scene.add(bottle);
+
+      bottle.scale.setScalar(0);
+      gsap.to(bottle.scale, { x: sc, y: sc, z: sc, duration: 2.0, ease: 'back.out(1.1)', delay: 0.4 });
+
+      ScrollTrigger.create({
+        trigger: '#scroll-container',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 2.5,
+        onUpdate: (s) => {
+          scrollState.rotY = s.progress * Math.PI * 2;
+          scrollState.posY = -s.progress * 0.6;
+        }
+      });
+
+      finishLoader();
+    },
+    (xhr) => { if (xhr.total) updateLoader(xhr.loaded / xhr.total); }
+  );
+});
+
+// ─── LOADER COUNTER ───────────────────────────────────────────────
+const counterEl = document.getElementById('loader-counter');
+const lineEl    = document.getElementById('loader-line');
+let loadVal = 0;
+let targetVal = 0;
+let loaderDone = false;
+
+function updateLoader(pct) {
+  targetVal = Math.round(pct * 100);
+  lineEl.style.width = targetVal + '%';
+}
+
+function tickCounter() {
+  if (loadVal < targetVal) {
+    loadVal = Math.min(loadVal + 2, targetVal);
+    counterEl.textContent = String(loadVal).padStart(2, '0');
+    requestAnimationFrame(tickCounter);
+  }
+}
+requestAnimationFrame(tickCounter);
+
+function finishLoader() {
+  if (loaderDone) return;
+  loaderDone = true;
+  targetVal = 100;
+  lineEl.style.width = '100%';
+
+  function toHundred() {
+    if (loadVal < 100) {
+      loadVal = Math.min(loadVal + 3, 100);
+      counterEl.textContent = String(loadVal).padStart(2, '0');
+      requestAnimationFrame(toHundred);
+    } else {
+      setTimeout(() => {
+        document.getElementById('loader').classList.add('hidden');
+      }, 350);
+    }
+  }
+  toHundred();
+}
+
+// ─── SCROLL → BACKGROUND ──────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '#origins',
+  start: 'top bottom',
+  end: 'top top',
+  scrub: 2,
+  onUpdate: s => { bgMat.uniforms.uProgress.value = s.progress; }
+});
+ScrollTrigger.create({
+  trigger: '#heritage',
+  start: 'top bottom',
+  end: 'top top',
+  scrub: 2,
+  onUpdate: s => { bgMat.uniforms.uProgress.value = 1 + s.progress; }
+});
+
+// ─── TEXT REVEALS ─────────────────────────────────────────────────
+gsap.timeline({
+  scrollTrigger: { trigger: '#origins', start: 'top 65%', end: 'top 20%', scrub: 1 }
+})
+.to('#origins-eyebrow', { opacity: 1, y: 0, duration: 1 })
+.to('#origins-title',   { opacity: 1, y: 0, duration: 1 }, 0.1)
+.to('#origins-coords',  { opacity: 1, y: 0, duration: 1 }, 0.25)
+.to('#origins-body',    { opacity: 1, y: 0, duration: 1 }, 0.35);
+
+gsap.timeline({
+  scrollTrigger: { trigger: '#heritage', start: 'top 65%', end: 'top 20%', scrub: 1 }
+})
+.to('#heritage-eyebrow', { opacity: 1, y: 0, duration: 1 })
+.to('#heritage-year',    { opacity: 1, y: 0, duration: 1 }, 0.1)
+.to('#heritage-body',    { opacity: 1, y: 0, duration: 1 }, 0.3);
+
+gsap.timeline({
+  scrollTrigger: { trigger: '#eclipse-section', start: 'top 65%', end: 'top 20%', scrub: 1 }
+})
+.to('#eclipse-eyebrow', { opacity: 1, y: 0, duration: 1 })
+.to('#eclipse-title',   { opacity: 1, y: 0, duration: 1 }, 0.1)
+.to('#eclipse-sub',     { opacity: 1, y: 0, duration: 1 }, 0.25)
+.to('#eclipse-cta',     { opacity: 1, y: 0, duration: 1 }, 0.4);
+
+// ─── RENDER LOOP ──────────────────────────────────────────────────
+let elapsed = 0;
+(function loop() {
+  requestAnimationFrame(loop);
+  const dt = clock.getDelta();
+  elapsed += dt;
+
+  bgMat.uniforms.uTime.value = elapsed;
+
+  if (bottle) {
+    bottle.position.y = scrollState.posY + Math.sin(elapsed * 0.65) * 0.045;
+    bottle.rotation.y = scrollState.rotY + elapsed * 0.22;
+  }
+
+  renderer.render(scene, cam);
+})();
+
+// ─── RESIZE ───────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  cam.aspect = W() / H();
+  cam.updateProjectionMatrix();
+  renderer.setSize(W(), H());
+  bgMat.uniforms.uRes.value.set(W(), H());
+});
+</script>
+
 </body>
 </html>
