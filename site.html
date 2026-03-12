@@ -5,35 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mount Gay Eclipse — Est. 1703</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --gold: #c9a84c;
-      --cream: #f0e8d8;
-      --dark: #080604;
+      --navy:  #060e1a;
+      --gold:  #c9a84c;
+      --cream: #ede6d6;
+      --dim:   rgba(237,230,214,0.38);
     }
 
     html { scroll-behavior: auto; }
 
     body {
-      background: var(--dark);
+      background: var(--navy);
       color: var(--cream);
-      font-family: 'Space Mono', monospace;
+      font-family: 'Cormorant Garamond', serif;
       overflow-x: hidden;
     }
 
-    /* ─── Canvas ────────────────────────────────── */
+    /* ─── Canvas ──────────────────────────────────── */
     #canvas-container {
       position: fixed;
       inset: 0;
       z-index: 0;
     }
-
     canvas { display: block; }
 
-    /* ─── Grain ─────────────────────────────────── */
+    /* ─── Grain ───────────────────────────────────── */
     .grain {
       position: fixed;
       inset: -50%;
@@ -41,11 +41,10 @@
       height: 200%;
       z-index: 2;
       pointer-events: none;
-      opacity: 0.035;
+      opacity: 0.04;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       animation: grain-shift 0.5s steps(1) infinite;
     }
-
     @keyframes grain-shift {
       0%   { transform: translate(0,   0);   }
       25%  { transform: translate(-2%, -1%); }
@@ -54,7 +53,50 @@
       100% { transform: translate(-1%, 1%);  }
     }
 
-    /* ─── Nav ───────────────────────────────────── */
+    /* ─── Loading ─────────────────────────────────── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 3rem 3.5rem;
+      transition: opacity 0.9s ease;
+    }
+    #loader .loader-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+      opacity: 0.7;
+    }
+    #loader .loader-counter {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 18vw, 14rem);
+      line-height: 0.85;
+      color: var(--cream);
+      letter-spacing: -0.02em;
+    }
+    #loader .loader-line {
+      position: absolute;
+      bottom: 3rem;
+      right: 3.5rem;
+      width: 0%;
+      height: 1px;
+      background: var(--gold);
+      transition: width 0.3s ease;
+    }
+    #loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ─── Nav ─────────────────────────────────────── */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -62,35 +104,38 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      padding: 2rem 2.5rem;
+      padding: 2.2rem 3rem;
       pointer-events: none;
-      mix-blend-mode: normal;
     }
-
     .nav-logo {
-      font-size: 0.7rem;
-      letter-spacing: 0.25em;
-      line-height: 1.6;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.3em;
+      line-height: 1.8;
       text-transform: uppercase;
+      font-weight: 400;
     }
-
-    .nav-logo span { color: var(--gold); font-size: 0.6rem; }
-
-    .nav-right {
+    .nav-logo span {
+      color: var(--gold);
       font-size: 0.6rem;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.45em;
+    }
+    .nav-right {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
       text-align: right;
       line-height: 2;
-      opacity: 0.5;
+      opacity: 0.4;
+      font-style: italic;
     }
 
-    /* ─── Scroll container ──────────────────────── */
+    /* ─── Scroll container ────────────────────────── */
     #scroll-container {
       position: relative;
       z-index: 3;
       pointer-events: none;
     }
-
     .section {
       height: 100vh;
       position: relative;
@@ -99,203 +144,254 @@
       justify-content: center;
     }
 
-    /* ─── Section 1 · Hero ──────────────────────── */
-    #hero .left {
+    /* ─── Section 1 · Hero ────────────────────────── */
+    #hero { overflow: hidden; }
+
+    /* Texte fantôme derrière la bouteille */
+    .hero-ghost {
       position: absolute;
-      left: 2.5rem;
       top: 50%;
-      transform: translateY(-50%);
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(8rem, 28vw, 26rem);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(201,168,76,0.08);
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
     }
 
-    .hero-title {
-      font-size: clamp(3.5rem, 9vw, 8rem);
-      font-weight: 700;
-      line-height: 0.88;
-      letter-spacing: -0.01em;
-      text-transform: uppercase;
-    }
-
-    .hero-title span { display: block; }
-
-    #hero .right {
+    /* Labels périphériques */
+    .hero-top-left {
       position: absolute;
-      right: 2.5rem;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 6.5rem;
+      left: 3rem;
+    }
+    .hero-top-left h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      line-height: 1;
+      letter-spacing: 0.05em;
+      color: var(--cream);
+    }
+    .hero-top-left h1 span { color: var(--gold); }
+
+    .hero-top-right {
+      position: absolute;
+      top: 6.5rem;
+      right: 3rem;
       text-align: right;
     }
-
-    .hero-year {
-      color: var(--gold);
-      font-size: clamp(1rem, 2.5vw, 1.8rem);
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      line-height: 1.2;
-    }
-
-    .hero-desc {
-      margin-top: 0.8rem;
-      font-size: 0.6rem;
+    .hero-top-right p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.65rem;
       letter-spacing: 0.35em;
+      text-transform: uppercase;
+      line-height: 2.2;
       opacity: 0.4;
-      line-height: 2;
     }
 
-    .hero-bottom {
+    .hero-bottom-left {
       position: absolute;
-      bottom: 2.5rem;
-      left: 50%;
-      transform: translateX(-50%);
+      bottom: 3rem;
+      left: 3rem;
+    }
+    .hero-bottom-left p {
+      font-family: 'Cormorant Garamond', serif;
       font-size: 0.6rem;
-      letter-spacing: 0.4em;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
       opacity: 0.3;
-      white-space: nowrap;
+      font-style: italic;
     }
 
-    .scroll-line {
+    .scroll-indicator {
       position: absolute;
-      bottom: 2rem;
-      right: 2.5rem;
+      bottom: 2.8rem;
+      right: 3rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.6rem;
+    }
+    .scroll-indicator span {
+      font-family: 'Cormorant Garamond', serif;
       font-size: 0.55rem;
-      letter-spacing: 0.3em;
-      opacity: 0.25;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      opacity: 0.3;
       writing-mode: vertical-rl;
     }
-
-    .scroll-line::after {
+    .scroll-indicator::after {
       content: '';
       display: block;
       width: 1px;
-      height: 40px;
-      background: var(--cream);
-      opacity: 0.4;
+      height: 50px;
+      background: var(--gold);
+      opacity: 0.25;
     }
 
-    /* ─── Section 2 · Origins ───────────────────── */
+    /* ─── Section 2 · Origins ─────────────────────── */
     #origins .content {
-      text-align: center;
+      text-align: left;
+      padding: 0 3rem;
       width: 100%;
-      padding: 0 1.5rem;
     }
-
     .origins-eyebrow {
-      font-size: 0.6rem;
-      letter-spacing: 0.5em;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.55em;
       color: var(--gold);
-      margin-bottom: 1.5rem;
-      opacity: 0;
-      transform: translateY(20px);
-    }
-
-    .origins-title {
-      font-size: clamp(5rem, 18vw, 16rem);
-      font-weight: 700;
-      line-height: 0.82;
-      letter-spacing: -0.02em;
       text-transform: uppercase;
+      margin-bottom: 1rem;
       opacity: 0;
-      transform: translateY(30px);
+      transform: translateY(20px);
     }
-
-    .origins-coords {
+    .origins-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 20vw, 18rem);
+      line-height: 0.82;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      color: var(--cream);
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    .origins-meta {
+      display: flex;
+      align-items: flex-start;
+      gap: 3rem;
       margin-top: 2rem;
-      font-size: 0.65rem;
-      letter-spacing: 0.4em;
+    }
+    .origins-coords {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.35em;
       color: var(--gold);
+      font-style: italic;
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(16px);
     }
-
     .origins-body {
-      margin-top: 1rem;
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      opacity: 0;
-      transform: translateY(20px);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
       line-height: 2;
-      color: rgba(240,232,216,0.5);
+      color: var(--dim);
+      opacity: 0;
+      transform: translateY(16px);
+      max-width: 320px;
     }
 
-    /* ─── Section 3 · Eclipse ───────────────────── */
+    /* ─── Section 3 · Heritage ────────────────────── */
+    #heritage .content {
+      text-align: right;
+      padding: 0 3rem;
+      width: 100%;
+    }
+    .heritage-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.55em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .heritage-year {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 22vw, 20rem);
+      line-height: 0.82;
+      letter-spacing: 0.01em;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(201,168,76,0.35);
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    .heritage-body {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.9rem;
+      font-style: italic;
+      letter-spacing: 0.05em;
+      line-height: 2;
+      color: var(--dim);
+      opacity: 0;
+      transform: translateY(16px);
+      max-width: 340px;
+      margin-left: auto;
+      margin-top: 1.5rem;
+    }
+
+    /* ─── Section 4 · Eclipse ─────────────────────── */
     #eclipse-section .content {
       text-align: center;
       width: 100%;
+      padding: 0 1rem;
     }
-
     .eclipse-eyebrow {
-      font-size: 0.6rem;
-      letter-spacing: 0.5em;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.55em;
       color: var(--gold);
+      text-transform: uppercase;
       opacity: 0;
       transform: translateY(20px);
     }
-
     .eclipse-title {
-      font-size: clamp(5rem, 22vw, 20rem);
-      font-weight: 700;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(6rem, 26vw, 24rem);
       line-height: 0.8;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.01em;
       text-transform: uppercase;
       opacity: 0;
-      transform: translateY(40px);
-      background: linear-gradient(160deg, #f0e8d8 0%, #c9a84c 50%, #8a5c1e 100%);
+      transform: translateY(50px);
+      background: linear-gradient(150deg, #ede6d6 0%, #c9a84c 45%, #7a4e18 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-
     .eclipse-sub {
-      margin-top: 1.5rem;
-      font-size: 0.6rem;
-      letter-spacing: 0.5em;
-      opacity: 0;
-      transform: translateY(20px);
-    }
-
-    /* ─── Loading screen ────────────────────────── */
-    #loader {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      background: var(--dark);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 1.5rem;
-      transition: opacity 0.8s ease;
-    }
-
-    #loader .loader-logo {
-      font-size: 0.7rem;
+      margin-top: 1.8rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.75rem;
+      font-style: italic;
       letter-spacing: 0.4em;
-      opacity: 0.6;
-    }
-
-    #loader .loader-bar-bg {
-      width: 120px;
-      height: 1px;
-      background: rgba(240,232,216,0.15);
-      position: relative;
-      overflow: hidden;
-    }
-
-    #loader .loader-bar {
-      position: absolute;
-      top: 0; left: 0;
-      height: 100%;
-      width: 0%;
-      background: var(--gold);
-      transition: width 0.3s ease;
-    }
-
-    #loader.hidden {
       opacity: 0;
-      pointer-events: none;
+      transform: translateY(16px);
+      color: var(--dim);
+    }
+    .eclipse-cta {
+      display: inline-block;
+      margin-top: 3rem;
+      padding: 1rem 3rem;
+      border: 1px solid rgba(201,168,76,0.4);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0;
+      transform: translateY(16px);
+      pointer-events: auto;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+    }
+    .eclipse-cta:hover {
+      background: var(--gold);
+      color: var(--navy);
+    }
+
+    /* ─── Horizontal rule ─────────────────────────── */
+    .section-hr {
+      position: absolute;
+      bottom: 0; left: 3rem; right: 3rem;
+      height: 1px;
+      background: rgba(201,168,76,0.12);
     }
   </style>
 </head>
@@ -303,10 +399,9 @@
 
 <!-- Loading -->
 <div id="loader">
-  <div class="loader-logo">MOUNT GAY · ECLIPSE</div>
-  <div class="loader-bar-bg">
-    <div class="loader-bar" id="loader-bar"></div>
-  </div>
+  <div class="loader-eyebrow">Mount Gay · Eclipse · Est. 1703</div>
+  <div class="loader-counter" id="loader-counter">0</div>
+  <div class="loader-line" id="loader-line"></div>
 </div>
 
 <!-- Canvas Three.js -->
@@ -320,13 +415,13 @@
 <!-- Nav -->
 <nav>
   <div class="nav-logo">
-    MOUNT GAY<br>
-    <span>BARBADOS RUM</span>
+    Mount Gay<br>
+    <span>Barbados Rum</span>
   </div>
   <div class="nav-right">
-    EST. 1703<br>
-    ECLIPSE<br>
-    HERITAGE BLEND
+    Est. 1703<br>
+    Eclipse<br>
+    Heritage Blend
   </div>
 </nav>
 
@@ -335,56 +430,92 @@
 
   <!-- Hero -->
   <section class="section" id="hero">
-    <div class="left">
-      <h1 class="hero-title" id="hero-title">
-        <span>MOUNT</span>
-        <span>GAY</span>
-      </h1>
+    <!-- Ghost text derrière la bouteille -->
+    <div class="hero-ghost">ECLIPSE</div>
+
+    <!-- Labels périphériques -->
+    <div class="hero-top-left">
+      <h1>Mount <span>Gay</span></h1>
     </div>
-    <div class="right">
-      <div class="hero-year">EST.<br>1703</div>
-      <div class="hero-desc">
-        BARBADOS · RUM<br>
-        HERITAGE BLEND<br>
-        CRISP & AROMATIC
-      </div>
+    <div class="hero-top-right">
+      <p>Est. 1703</p>
+      <p>Eclipse</p>
+      <p>Barbados Rum</p>
     </div>
-    <div class="hero-bottom">SCROLL TO EXPLORE</div>
-    <div class="scroll-line">SCROLL</div>
+    <div class="hero-bottom-left">
+      <p>The World's Oldest Rum Distillery</p>
+    </div>
+    <div class="scroll-indicator"><span>Scroll</span></div>
+    <div class="section-hr"></div>
   </section>
 
   <!-- Origins -->
   <section class="section" id="origins">
     <div class="content">
-      <div class="origins-eyebrow" id="origins-eyebrow">THE BIRTHPLACE OF RUM</div>
-      <h2 class="origins-title" id="origins-title">BARBADOS</h2>
-      <div class="origins-coords" id="origins-coords">13°10'N · 59°32'W</div>
-      <div class="origins-body" id="origins-body">
-        The island that gave birth to rum.<br>
-        Over 320 years of uninterrupted distillation.
+      <div class="origins-eyebrow" id="origins-eyebrow">The Birthplace of Rum</div>
+      <h2 class="origins-title" id="origins-title">Barbados</h2>
+      <div class="origins-meta">
+        <div class="origins-coords" id="origins-coords">13°10'N · 59°32'W</div>
+        <div class="origins-body" id="origins-body">
+          The island that gave birth to rum.<br>
+          Over 320 years of uninterrupted distillation.
+        </div>
       </div>
     </div>
+    <div class="section-hr"></div>
+  </section>
+
+  <!-- Heritage -->
+  <section class="section" id="heritage">
+    <div class="content">
+      <div class="heritage-eyebrow" id="heritage-eyebrow">Unbroken Since</div>
+      <h2 class="heritage-year" id="heritage-year">1703</h2>
+      <div class="heritage-body" id="heritage-body">
+        From the coral-limestone soils of Barbados,<br>
+        a legacy distilled through centuries.
+      </div>
+    </div>
+    <div class="section-hr"></div>
   </section>
 
   <!-- Eclipse -->
   <section class="section" id="eclipse-section">
     <div class="content">
-      <div class="eclipse-eyebrow" id="eclipse-eyebrow">MOUNT GAY · BARBADOS</div>
-      <h2 class="eclipse-title" id="eclipse-title">ECLIPSE</h2>
-      <div class="eclipse-sub" id="eclipse-sub">CRAFTED FOR THOSE WHO SEEK THE EXTRAORDINARY</div>
+      <div class="eclipse-eyebrow" id="eclipse-eyebrow">Mount Gay · Barbados</div>
+      <h2 class="eclipse-title" id="eclipse-title">Eclipse</h2>
+      <div class="eclipse-sub" id="eclipse-sub">Crafted for those who seek the extraordinary</div>
+      <a class="eclipse-cta" id="eclipse-cta" href="experience.html">Discover the AR Experience</a>
     </div>
   </section>
 
 </div>
 
-<!-- Three.js + loaders -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.163.0/examples/js/loaders/GLTFLoader.js"></script>
+<!-- Scripts (synchrones — doivent être disponibles avant le module) -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
 
-<script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
 gsap.registerPlugin(ScrollTrigger);
+
+// ─── LENIS SMOOTH SCROLL ──────────────────────────────────────────
+const lenis = new Lenis({ lerp: 0.08, smoothWheel: true });
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+gsap.ticker.lagSmoothing(0);
 
 // ─── RENDERER ────────────────────────────────────────────────────
 const canvas  = document.getElementById('three-canvas');
@@ -396,13 +527,13 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(W(), H());
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.3;
+renderer.toneMappingExposure = 1.4;
 
 const scene = new THREE.Scene();
 const cam = new THREE.PerspectiveCamera(40, W() / H(), 0.1, 100);
 cam.position.set(0, 0, 5);
 
-// ─── ATMOSPHERIC BACKGROUND SHADER ───────────────────────────────
+// ─── BACKGROUND SHADER — BLEU NUIT + HALO AMBRE ──────────────────
 const bgMat = new THREE.ShaderMaterial({
   depthWrite: false,
   uniforms: {
@@ -416,38 +547,35 @@ const bgMat = new THREE.ShaderMaterial({
     uniform float uTime;
     uniform vec2  uRes;
 
-    // Palette : noir chaud | bleu nuit | ambre sombre
-    vec3 c0 = vec3(0.030, 0.022, 0.012);
-    vec3 c1 = vec3(0.016, 0.028, 0.055);
-    vec3 c2 = vec3(0.055, 0.034, 0.008);
+    // Palette bleu nuit profond
+    vec3 c0 = vec3(0.024, 0.043, 0.078);  // bleu nuit base
+    vec3 c1 = vec3(0.018, 0.032, 0.065);  // bleu nuit plus sombre
+    vec3 c2 = vec3(0.028, 0.050, 0.090);  // bleu nuit légèrement plus clair
 
-    vec3 g0 = vec3(0.320, 0.180, 0.040);  // halo ambre chaud
-    vec3 g1 = vec3(0.040, 0.080, 0.180);  // halo bleu nuit
-    vec3 g2 = vec3(0.380, 0.220, 0.040);  // halo or
-
-    float smin(float a, float b, float k) {
-      float h = clamp(0.5 + 0.5*(b-a)/k, 0.0, 1.0);
-      return mix(b, a, h) - k*h*(1.0-h);
-    }
+    // Halos ambre / or doux
+    vec3 g0 = vec3(0.200, 0.130, 0.030);  // halo ambre sombre
+    vec3 g1 = vec3(0.120, 0.090, 0.020);  // halo or subtil
+    vec3 g2 = vec3(0.260, 0.160, 0.035);  // halo ambre plus chaud
 
     void main() {
       vec2 uv = gl_FragCoord.xy / uRes;
-      vec2 p  = uv - 0.5;
+      vec2 p  = uv - vec2(0.5, 0.38);
       float d = length(p);
 
-      // Breathing glow
-      float breathe = sin(uTime * 0.4) * 0.04 + 1.0;
+      float breathe = sin(uTime * 0.35) * 0.035 + 1.0;
 
-      vec3 bg, glow;
       float t = clamp(uProgress, 0.0, 1.0);
       float s = clamp(uProgress - 1.0, 0.0, 1.0);
 
-      bg   = mix(mix(c0, c1, t), c2, s);
-      glow = mix(mix(g0, g1, t), g2, s);
+      vec3 bg   = mix(mix(c0, c1, t), c2, s);
+      vec3 glow = mix(mix(g0, g1, t), g2, s);
 
-      float halo = (1.0 - smoothstep(0.0, 0.85 * breathe, d)) * 0.55;
+      float halo = (1.0 - smoothstep(0.0, 0.90 * breathe, d)) * 0.45;
       vec3 col = bg + glow * halo;
-      col *= 1.0 - d * 0.35;
+
+      // Vignette
+      float vig = 1.0 - smoothstep(0.45, 1.2, length(uv - 0.5));
+      col *= vig;
 
       gl_FragColor = vec4(col, 1.0);
     }
@@ -457,80 +585,114 @@ const bgMesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat);
 bgMesh.renderOrder = -1;
 scene.add(bgMesh);
 
-// ─── LIGHTING ────────────────────────────────────────────────────
-scene.add(new THREE.AmbientLight(0xfff0d0, 0.5));
+// ─── LIGHTING ─────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0xd0c0a0, 0.4));
 
-const key = new THREE.DirectionalLight(0xffd070, 3.0);
+const key = new THREE.DirectionalLight(0xffd060, 3.5);
 key.position.set(2, 3, 4);
 scene.add(key);
 
-const fill = new THREE.DirectionalLight(0x3050a0, 1.0);
+const fill = new THREE.DirectionalLight(0x2040a0, 0.8);
 fill.position.set(-3, 0, 1);
 scene.add(fill);
 
-const rim = new THREE.DirectionalLight(0xffb030, 2.0);
+const rim = new THREE.DirectionalLight(0xffb020, 2.2);
 rim.position.set(0.5, -3, -2);
 scene.add(rim);
 
-// ─── BOTTLE ──────────────────────────────────────────────────────
+// ─── BOTTLE ───────────────────────────────────────────────────────
 let bottle = null;
-let mixer  = null;
 const clock = new THREE.Clock();
+const scrollState = { rotY: 0, posY: 0 };
 
-// Scroll state — séparé du idle pour pouvoir les combiner proprement
-const scrollState = { rotY: 0, posY: 0, scale: 1 };
+const OBJ_BASE = 'assets/Meshy_AI_Whiskey_Bottle_0312102948_texture_obj/';
+const OBJ_NAME = 'Meshy_AI_Whiskey_Bottle_0312102948_texture';
 
-new THREE.GLTFLoader().load(
-  'assets/satanim3.glb',
-  (gltf) => {
-    bottle = gltf.scene;
+const mtlLoader = new MTLLoader();
+mtlLoader.setPath(OBJ_BASE);
+mtlLoader.load(OBJ_NAME + '.mtl', (materials) => {
+  materials.preload();
 
-    // Centrer et normaliser
-    const box  = new THREE.Box3().setFromObject(bottle);
-    const size = box.getSize(new THREE.Vector3());
-    const ctr  = box.getCenter(new THREE.Vector3());
-    const sc   = 2.2 / Math.max(size.x, size.y, size.z);
+  const objLoader = new OBJLoader();
+  objLoader.setMaterials(materials);
+  objLoader.setPath(OBJ_BASE);
+  objLoader.load(
+    OBJ_NAME + '.obj',
+    (obj) => {
+      bottle = obj;
 
-    bottle.scale.setScalar(sc);
-    bottle.position.copy(ctr.multiplyScalar(-sc));
+      const box  = new THREE.Box3().setFromObject(bottle);
+      const size = box.getSize(new THREE.Vector3());
+      const ctr  = box.getCenter(new THREE.Vector3());
+      const sc   = 2.8 / Math.max(size.x, size.y, size.z);
 
-    // Animations intégrées au GLB
-    if (gltf.animations?.length) {
-      mixer = new THREE.AnimationMixer(bottle);
-      gltf.animations.forEach(c => mixer.clipAction(c).play());
-    }
+      bottle.scale.setScalar(sc);
+      bottle.position.copy(ctr.multiplyScalar(-sc));
 
-    scene.add(bottle);
+      scene.add(bottle);
 
-    // Intro
-    bottle.scale.setScalar(0);
-    gsap.to(bottle.scale, { x: sc, y: sc, z: sc, duration: 1.6, ease: 'back.out(1.4)', delay: 0.2 });
+      bottle.scale.setScalar(0);
+      gsap.to(bottle.scale, { x: sc, y: sc, z: sc, duration: 2.0, ease: 'back.out(1.1)', delay: 0.4 });
 
-    // Scroll : rotate + drift
-    ScrollTrigger.create({
-      trigger: '#scroll-container',
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 2.5,
-      onUpdate: (s) => {
-        scrollState.rotY = s.progress * Math.PI * 2;
-        scrollState.posY = -s.progress * 0.6;
-      }
-    });
+      ScrollTrigger.create({
+        trigger: '#scroll-container',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 2.5,
+        onUpdate: (s) => {
+          scrollState.rotY = s.progress * Math.PI * 2;
+          scrollState.posY = -s.progress * 0.6;
+        }
+      });
 
-    // Loader out
-    document.getElementById('loader-bar').style.width = '100%';
-    setTimeout(() => {
-      document.getElementById('loader').classList.add('hidden');
-    }, 400);
-  },
-  (xhr) => {
-    const pct = (xhr.loaded / xhr.total * 100).toFixed(0);
-    document.getElementById('loader-bar').style.width = pct + '%';
+      finishLoader();
+    },
+    (xhr) => { if (xhr.total) updateLoader(xhr.loaded / xhr.total); }
+  );
+});
+
+// ─── LOADER COUNTER ───────────────────────────────────────────────
+const counterEl = document.getElementById('loader-counter');
+const lineEl    = document.getElementById('loader-line');
+let loadVal = 0;
+let targetVal = 0;
+let loaderDone = false;
+
+function updateLoader(pct) {
+  targetVal = Math.round(pct * 100);
+  lineEl.style.width = targetVal + '%';
+}
+
+function tickCounter() {
+  if (loadVal < targetVal) {
+    loadVal = Math.min(loadVal + 2, targetVal);
+    counterEl.textContent = String(loadVal).padStart(2, '0');
+    requestAnimationFrame(tickCounter);
   }
-);
+}
+requestAnimationFrame(tickCounter);
 
-// ─── SCROLL → BACKGROUND ─────────────────────────────────────────
+function finishLoader() {
+  if (loaderDone) return;
+  loaderDone = true;
+  targetVal = 100;
+  lineEl.style.width = '100%';
+
+  function toHundred() {
+    if (loadVal < 100) {
+      loadVal = Math.min(loadVal + 3, 100);
+      counterEl.textContent = String(loadVal).padStart(2, '0');
+      requestAnimationFrame(toHundred);
+    } else {
+      setTimeout(() => {
+        document.getElementById('loader').classList.add('hidden');
+      }, 350);
+    }
+  }
+  toHundred();
+}
+
+// ─── SCROLL → BACKGROUND ──────────────────────────────────────────
 ScrollTrigger.create({
   trigger: '#origins',
   start: 'top bottom',
@@ -538,52 +700,56 @@ ScrollTrigger.create({
   scrub: 2,
   onUpdate: s => { bgMat.uniforms.uProgress.value = s.progress; }
 });
-
 ScrollTrigger.create({
-  trigger: '#eclipse-section',
+  trigger: '#heritage',
   start: 'top bottom',
   end: 'top top',
   scrub: 2,
   onUpdate: s => { bgMat.uniforms.uProgress.value = 1 + s.progress; }
 });
 
-// ─── SCROLL → TEXT REVEALS ───────────────────────────────────────
+// ─── TEXT REVEALS ─────────────────────────────────────────────────
 gsap.timeline({
-  scrollTrigger: { trigger: '#origins', start: 'top 65%', end: 'top 25%', scrub: 1 }
+  scrollTrigger: { trigger: '#origins', start: 'top 65%', end: 'top 20%', scrub: 1 }
 })
 .to('#origins-eyebrow', { opacity: 1, y: 0, duration: 1 })
-.to('#origins-title',   { opacity: 1, y: 0, duration: 1 }, 0.15)
-.to('#origins-coords',  { opacity: 1, y: 0, duration: 1 }, 0.3)
-.to('#origins-body',    { opacity: 1, y: 0, duration: 1 }, 0.45);
+.to('#origins-title',   { opacity: 1, y: 0, duration: 1 }, 0.1)
+.to('#origins-coords',  { opacity: 1, y: 0, duration: 1 }, 0.25)
+.to('#origins-body',    { opacity: 1, y: 0, duration: 1 }, 0.35);
 
 gsap.timeline({
-  scrollTrigger: { trigger: '#eclipse-section', start: 'top 65%', end: 'top 25%', scrub: 1 }
+  scrollTrigger: { trigger: '#heritage', start: 'top 65%', end: 'top 20%', scrub: 1 }
+})
+.to('#heritage-eyebrow', { opacity: 1, y: 0, duration: 1 })
+.to('#heritage-year',    { opacity: 1, y: 0, duration: 1 }, 0.1)
+.to('#heritage-body',    { opacity: 1, y: 0, duration: 1 }, 0.3);
+
+gsap.timeline({
+  scrollTrigger: { trigger: '#eclipse-section', start: 'top 65%', end: 'top 20%', scrub: 1 }
 })
 .to('#eclipse-eyebrow', { opacity: 1, y: 0, duration: 1 })
-.to('#eclipse-title',   { opacity: 1, y: 0, duration: 1 }, 0.15)
-.to('#eclipse-sub',     { opacity: 1, y: 0, duration: 1 }, 0.35);
+.to('#eclipse-title',   { opacity: 1, y: 0, duration: 1 }, 0.1)
+.to('#eclipse-sub',     { opacity: 1, y: 0, duration: 1 }, 0.25)
+.to('#eclipse-cta',     { opacity: 1, y: 0, duration: 1 }, 0.4);
 
-// ─── RENDER LOOP ─────────────────────────────────────────────────
-let t = 0;
+// ─── RENDER LOOP ──────────────────────────────────────────────────
+let elapsed = 0;
 (function loop() {
   requestAnimationFrame(loop);
   const dt = clock.getDelta();
-  t += dt;
+  elapsed += dt;
 
-  bgMat.uniforms.uTime.value = t;
-  if (mixer) mixer.update(dt);
+  bgMat.uniforms.uTime.value = elapsed;
 
   if (bottle) {
-    // Idle float
-    bottle.position.y = scrollState.posY + Math.sin(t * 0.7) * 0.04;
-    // Idle rotation + scroll rotation
-    bottle.rotation.y = scrollState.rotY + t * 0.25;
+    bottle.position.y = scrollState.posY + Math.sin(elapsed * 0.65) * 0.045;
+    bottle.rotation.y = scrollState.rotY + elapsed * 0.22;
   }
 
   renderer.render(scene, cam);
 })();
 
-// ─── RESIZE ──────────────────────────────────────────────────────
+// ─── RESIZE ───────────────────────────────────────────────────────
 window.addEventListener('resize', () => {
   cam.aspect = W() / H();
   cam.updateProjectionMatrix();
