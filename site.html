@@ -702,7 +702,6 @@
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
 
 <script type="importmap">
 {
@@ -730,10 +729,7 @@ document.getElementById('ag-no').addEventListener('click', () => {
 
 // ─── GSAP + SCROLL ────────────────────────────────────
 gsap.registerPlugin(ScrollTrigger);
-const lenis = new Lenis({ lerp: 0.08, smoothWheel: true });
-lenis.on('scroll', ScrollTrigger.update);
-gsap.ticker.add((time) => { lenis.raf(time * 1000); });
-gsap.ticker.lagSmoothing(0);
+ScrollTrigger.normalizeScroll(true);
 
 // ─── NAV SCROLL STATE ─────────────────────────────────
 const nav = document.getElementById('main-nav');
@@ -869,6 +865,8 @@ function finishLoader() {
     else { setTimeout(() => document.getElementById('loader').classList.add('hidden'), 350); }
   })();
 }
+// Sécurité : ferme le loader après 5s quoi qu'il arrive
+setTimeout(finishLoader, 5000);
 
 // ─── SCROLL REVEALS ───────────────────────────────────
 function reveal(ids, trigger, stagger = 0.12) {
