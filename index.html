@@ -5,18 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mount Gay Eclipse — Est. 1703</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
       --navy:  #060e1a;
       --gold:  #c9a84c;
       --cream: #ede6d6;
-      --dim:   rgba(237,230,214,0.38);
+      --dim:   rgba(237,230,214,0.45);
+      --nav-h: 5rem;
     }
 
-    html { scroll-behavior: auto; }
+    html { scroll-behavior: smooth; }
 
     body {
       background: var(--navy);
@@ -25,379 +26,467 @@
       overflow-x: hidden;
     }
 
-    /* ─── Canvas ──────────────────────────────────── */
-    #canvas-container {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-    }
-    canvas { display: block; }
-
-    /* ─── Grain ───────────────────────────────────── */
+    /* ─── GRAIN ───────────────────────────────────────── */
     .grain {
-      position: fixed;
-      inset: -50%;
-      width: 200%;
-      height: 200%;
-      z-index: 2;
-      pointer-events: none;
-      opacity: 0.04;
+      position: fixed; inset: -50%;
+      width: 200%; height: 200%;
+      z-index: 2; pointer-events: none; opacity: 0.04;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      animation: grain-shift 0.5s steps(1) infinite;
+      animation: grain 0.5s steps(1) infinite;
     }
-    @keyframes grain-shift {
-      0%   { transform: translate(0,   0);   }
-      25%  { transform: translate(-2%, -1%); }
-      50%  { transform: translate(1%,  2%);  }
-      75%  { transform: translate(2%, -2%);  }
-      100% { transform: translate(-1%, 1%);  }
+    @keyframes grain {
+      0%   { transform: translate(0,0); }
+      25%  { transform: translate(-2%,-1%); }
+      50%  { transform: translate(1%,2%); }
+      75%  { transform: translate(2%,-2%); }
+      100% { transform: translate(-1%,1%); }
     }
 
-    /* ─── Loading ─────────────────────────────────── */
-    #loader {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
+    /* ─── AGE GATE ────────────────────────────────────── */
+    #age-gate {
+      position: fixed; inset: 0; z-index: 200;
       background: var(--navy);
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: flex-end;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2rem; padding: 2rem;
+      transition: opacity 0.6s ease;
+    }
+    #age-gate.hidden { opacity: 0; pointer-events: none; }
+    .ag-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 6vw, 4rem);
+      letter-spacing: 0.1em; color: var(--cream);
+    }
+    .ag-logo span { color: var(--gold); }
+    .ag-sub {
+      font-size: 0.7rem; letter-spacing: 0.45em;
+      text-transform: uppercase; color: var(--gold); opacity: 0.8;
+    }
+    .ag-question {
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-style: italic; letter-spacing: 0.05em;
+      opacity: 0.7; text-align: center;
+    }
+    .ag-buttons { display: flex; gap: 1.5rem; }
+    .ag-btn {
+      padding: 0.9rem 3rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.75rem; letter-spacing: 0.45em;
+      text-transform: uppercase; cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+      border: 1px solid rgba(201,168,76,0.5);
+      background: transparent; color: var(--cream);
+    }
+    .ag-btn.primary {
+      background: var(--gold); color: var(--navy);
+      border-color: var(--gold);
+    }
+    .ag-btn:hover { opacity: 0.8; }
+    .ag-legal {
+      font-size: 0.55rem; letter-spacing: 0.2em;
+      opacity: 0.3; text-align: center; max-width: 400px;
+      line-height: 1.8;
+    }
+
+    /* ─── LOADER ──────────────────────────────────────── */
+    #loader {
+      position: fixed; inset: 0; z-index: 100;
+      background: var(--navy);
+      display: flex; flex-direction: column;
+      align-items: flex-start; justify-content: flex-end;
       padding: 3rem 3.5rem;
       transition: opacity 0.9s ease;
     }
     #loader .loader-eyebrow {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.7rem;
-      letter-spacing: 0.45em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 0.6rem;
-      opacity: 0.7;
+      font-size: 0.7rem; letter-spacing: 0.45em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 0.6rem; opacity: 0.7;
     }
     #loader .loader-counter {
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(5rem, 18vw, 14rem);
-      line-height: 0.85;
-      color: var(--cream);
+      line-height: 0.85; color: var(--cream);
       letter-spacing: -0.02em;
     }
     #loader .loader-line {
-      position: absolute;
-      bottom: 3rem;
-      right: 3.5rem;
-      width: 0%;
-      height: 1px;
-      background: var(--gold);
+      position: absolute; bottom: 3rem; right: 3.5rem;
+      width: 0%; height: 1px; background: var(--gold);
       transition: width 0.3s ease;
     }
-    #loader.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
+    #loader.hidden { opacity: 0; pointer-events: none; }
 
-    /* ─── Nav ─────────────────────────────────────── */
+    /* ─── CANVAS ──────────────────────────────────────── */
+    #canvas-container {
+      position: fixed; inset: 0; z-index: 0;
+    }
+    canvas { display: block; }
+
+    /* ─── NAV ─────────────────────────────────────────── */
     nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 10;
-      display: flex;
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 10; height: var(--nav-h);
+      display: flex; align-items: center;
       justify-content: space-between;
-      align-items: flex-start;
-      padding: 2.2rem 3rem;
-      pointer-events: none;
+      padding: 0 3rem;
+      border-bottom: 1px solid rgba(201,168,76,0);
+      transition: border-color 0.4s, background 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(6,14,26,0.92);
+      backdrop-filter: blur(12px);
+      border-color: rgba(201,168,76,0.12);
     }
     .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem; letter-spacing: 0.12em;
+      color: var(--cream); text-decoration: none;
+    }
+    .nav-logo span { color: var(--gold); }
+    .nav-links {
+      display: flex; align-items: center; gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 0.68rem;
-      letter-spacing: 0.3em;
-      line-height: 1.8;
-      text-transform: uppercase;
-      font-weight: 400;
+      font-size: 0.65rem; letter-spacing: 0.35em;
+      text-transform: uppercase; color: var(--cream);
+      text-decoration: none; opacity: 0.55;
+      transition: opacity 0.2s;
     }
-    .nav-logo span {
-      color: var(--gold);
-      font-size: 0.6rem;
-      letter-spacing: 0.45em;
-    }
-    .nav-right {
+    .nav-links a:hover { opacity: 1; }
+    .nav-cta {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      text-align: right;
-      line-height: 2;
-      opacity: 0.4;
-      font-style: italic;
+      font-size: 0.6rem; letter-spacing: 0.45em;
+      text-transform: uppercase; color: var(--gold);
+      text-decoration: none;
+      border: 1px solid rgba(201,168,76,0.4);
+      padding: 0.5rem 1.4rem;
+      transition: background 0.3s, color 0.3s;
     }
+    .nav-cta:hover { background: var(--gold); color: var(--navy); }
 
-    /* ─── Scroll container ────────────────────────── */
-    #scroll-container {
-      position: relative;
-      z-index: 3;
-      pointer-events: none;
-    }
+    /* ─── SECTIONS COMMUNES ───────────────────────────── */
     .section {
-      height: 100vh;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: relative; z-index: 3;
+      min-height: 100vh;
+      display: flex; align-items: center;
+    }
+    .section-inner {
+      width: 100%; padding: 0 3rem;
+    }
+    .eyebrow {
+      font-size: 0.65rem; letter-spacing: 0.55em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 1rem; opacity: 0;
+      transform: translateY(18px);
+    }
+    .section-hr {
+      position: absolute; bottom: 0; left: 3rem; right: 3rem;
+      height: 1px; background: rgba(201,168,76,0.1);
     }
 
-    /* ─── Section 1 · Hero ────────────────────────── */
-    #hero { overflow: hidden; }
-
-    /* Texte fantôme derrière la bouteille */
+    /* ─── HERO ────────────────────────────────────────── */
+    #hero { height: 100vh; overflow: hidden; }
     .hero-ghost {
-      position: absolute;
-      top: 50%;
-      left: 50%;
+      position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(8rem, 28vw, 26rem);
-      line-height: 1;
-      letter-spacing: 0.04em;
+      line-height: 1; letter-spacing: 0.04em;
       color: transparent;
-      -webkit-text-stroke: 1px rgba(201,168,76,0.08);
-      white-space: nowrap;
-      pointer-events: none;
-      user-select: none;
-      z-index: 1;
+      -webkit-text-stroke: 1px rgba(201,168,76,0.07);
+      white-space: nowrap; pointer-events: none;
+      user-select: none; z-index: 1;
     }
-
-    /* Labels périphériques */
     .hero-top-left {
-      position: absolute;
-      top: 6.5rem;
-      left: 3rem;
+      position: absolute; top: calc(var(--nav-h) + 1.5rem); left: 3rem;
     }
     .hero-top-left h1 {
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(1.8rem, 3.5vw, 3rem);
-      line-height: 1;
-      letter-spacing: 0.05em;
-      color: var(--cream);
+      letter-spacing: 0.05em; color: var(--cream); line-height: 1;
     }
     .hero-top-left h1 span { color: var(--gold); }
-
     .hero-top-right {
-      position: absolute;
-      top: 6.5rem;
-      right: 3rem;
+      position: absolute; top: calc(var(--nav-h) + 1.5rem); right: 3rem;
       text-align: right;
     }
     .hero-top-right p {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.65rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      line-height: 2.2;
-      opacity: 0.4;
+      font-size: 0.65rem; letter-spacing: 0.35em;
+      text-transform: uppercase; line-height: 2.2; opacity: 0.4;
     }
-
     .hero-bottom-left {
-      position: absolute;
-      bottom: 3rem;
-      left: 3rem;
+      position: absolute; bottom: 3rem; left: 3rem;
     }
     .hero-bottom-left p {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.6rem;
-      letter-spacing: 0.5em;
-      text-transform: uppercase;
-      opacity: 0.3;
-      font-style: italic;
+      font-size: 0.6rem; letter-spacing: 0.5em;
+      text-transform: uppercase; opacity: 0.3; font-style: italic;
     }
-
     .scroll-indicator {
-      position: absolute;
-      bottom: 2.8rem;
-      right: 3rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.6rem;
+      position: absolute; bottom: 2.8rem; right: 3rem;
+      display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
     }
     .scroll-indicator span {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.55rem;
-      letter-spacing: 0.5em;
-      text-transform: uppercase;
-      opacity: 0.3;
-      writing-mode: vertical-rl;
+      font-size: 0.55rem; letter-spacing: 0.5em;
+      text-transform: uppercase; opacity: 0.3; writing-mode: vertical-rl;
     }
     .scroll-indicator::after {
-      content: '';
-      display: block;
-      width: 1px;
-      height: 50px;
-      background: var(--gold);
-      opacity: 0.25;
+      content: ''; display: block; width: 1px; height: 50px;
+      background: var(--gold); opacity: 0.25;
     }
 
-    /* ─── Section 2 · Origins ─────────────────────── */
-    #origins .content {
-      text-align: left;
-      padding: 0 3rem;
-      width: 100%;
+    /* ─── PRODUCT ─────────────────────────────────────── */
+    #product { background: transparent; }
+    #product .section-inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: center; padding: 8rem 3rem;
     }
-    .origins-eyebrow {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.7rem;
-      letter-spacing: 0.55em;
-      color: var(--gold);
-      text-transform: uppercase;
-      margin-bottom: 1rem;
-      opacity: 0;
-      transform: translateY(20px);
+    .product-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 12vw, 10rem);
+      line-height: 0.85; letter-spacing: 0.01em;
+      background: linear-gradient(150deg, #ede6d6 0%, #c9a84c 50%, #7a4e18 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; opacity: 0; transform: translateY(40px);
     }
+    .product-body {
+      opacity: 0; transform: translateY(24px);
+    }
+    .product-body p {
+      font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+      font-style: italic; line-height: 2; color: var(--dim);
+      margin-bottom: 2rem;
+    }
+    .tasting-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .tasting-note {
+      border-left: 1px solid rgba(201,168,76,0.3);
+      padding-left: 1rem;
+    }
+    .tasting-note .label {
+      font-size: 0.55rem; letter-spacing: 0.45em;
+      text-transform: uppercase; color: var(--gold); opacity: 0.8;
+      margin-bottom: 0.3rem;
+    }
+    .tasting-note .value {
+      font-size: 0.9rem; font-style: italic; opacity: 0.7;
+    }
+
+    /* ─── ORIGINS ─────────────────────────────────────── */
+    #origins { padding: 8rem 0; }
+    #origins .section-inner { max-width: 100%; }
     .origins-title {
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(5rem, 20vw, 18rem);
-      line-height: 0.82;
-      letter-spacing: 0.01em;
-      text-transform: uppercase;
-      color: var(--cream);
-      opacity: 0;
-      transform: translateY(40px);
+      line-height: 0.82; letter-spacing: 0.01em;
+      color: var(--cream); opacity: 0; transform: translateY(40px);
     }
     .origins-meta {
-      display: flex;
-      align-items: flex-start;
-      gap: 3rem;
-      margin-top: 2rem;
+      display: flex; gap: 4rem; margin-top: 2rem; align-items: flex-start;
     }
     .origins-coords {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.75rem;
-      letter-spacing: 0.35em;
-      color: var(--gold);
-      font-style: italic;
-      opacity: 0;
-      transform: translateY(16px);
+      font-size: 0.75rem; letter-spacing: 0.35em;
+      color: var(--gold); font-style: italic;
+      opacity: 0; transform: translateY(16px);
     }
     .origins-body {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.9rem;
-      letter-spacing: 0.05em;
-      line-height: 2;
-      color: var(--dim);
-      opacity: 0;
-      transform: translateY(16px);
-      max-width: 320px;
+      font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+      line-height: 2; color: var(--dim); max-width: 380px;
+      opacity: 0; transform: translateY(16px);
     }
 
-    /* ─── Section 3 · Heritage ────────────────────── */
-    #heritage .content {
-      text-align: right;
-      padding: 0 3rem;
-      width: 100%;
-    }
-    .heritage-eyebrow {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.7rem;
-      letter-spacing: 0.55em;
-      color: var(--gold);
-      text-transform: uppercase;
-      margin-bottom: 1rem;
-      opacity: 0;
-      transform: translateY(20px);
-    }
+    /* ─── HERITAGE ────────────────────────────────────── */
+    #heritage { padding: 8rem 0; text-align: right; }
     .heritage-year {
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(5rem, 22vw, 20rem);
-      line-height: 0.82;
-      letter-spacing: 0.01em;
-      color: transparent;
-      -webkit-text-stroke: 1px rgba(201,168,76,0.35);
-      opacity: 0;
-      transform: translateY(40px);
+      line-height: 0.82; color: transparent;
+      -webkit-text-stroke: 1px rgba(201,168,76,0.3);
+      opacity: 0; transform: translateY(40px);
     }
     .heritage-body {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.9rem;
-      font-style: italic;
-      letter-spacing: 0.05em;
-      line-height: 2;
-      color: var(--dim);
-      opacity: 0;
-      transform: translateY(16px);
-      max-width: 340px;
-      margin-left: auto;
-      margin-top: 1.5rem;
+      font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+      font-style: italic; line-height: 2; color: var(--dim);
+      max-width: 380px; margin-left: auto; margin-top: 1.5rem;
+      opacity: 0; transform: translateY(16px);
     }
 
-    /* ─── Section 4 · Eclipse ─────────────────────── */
-    #eclipse-section .content {
-      text-align: center;
-      width: 100%;
-      padding: 0 1rem;
+    /* ─── COCKTAILS ───────────────────────────────────── */
+    #cocktails { padding: 8rem 0; }
+    .cocktails-header {
+      display: flex; justify-content: space-between;
+      align-items: flex-end; margin-bottom: 4rem;
     }
-    .eclipse-eyebrow {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.7rem;
-      letter-spacing: 0.55em;
-      color: var(--gold);
-      text-transform: uppercase;
-      opacity: 0;
-      transform: translateY(20px);
+    .cocktails-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 8vw, 7rem);
+      line-height: 0.9; color: var(--cream);
+      opacity: 0; transform: translateY(30px);
     }
-    .eclipse-title {
+    .cocktails-link {
+      font-size: 0.6rem; letter-spacing: 0.45em;
+      text-transform: uppercase; color: var(--gold);
+      text-decoration: none; opacity: 0;
+      transform: translateY(16px);
+      border-bottom: 1px solid rgba(201,168,76,0.3);
+      padding-bottom: 0.2rem;
+    }
+    .cocktails-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+    }
+    .cocktail-card {
+      border: 1px solid rgba(201,168,76,0.12);
+      padding: 2.5rem 2rem;
+      transition: border-color 0.3s;
+      opacity: 0; transform: translateY(24px);
+    }
+    .cocktail-card:hover { border-color: rgba(201,168,76,0.4); }
+    .cocktail-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem; letter-spacing: 0.2em;
+      color: var(--gold); opacity: 0.5; margin-bottom: 1.2rem;
+    }
+    .cocktail-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      letter-spacing: 0.04em; line-height: 1;
+      margin-bottom: 1rem;
+    }
+    .cocktail-desc {
+      font-size: 0.85rem; font-style: italic;
+      line-height: 1.9; color: var(--dim);
+      margin-bottom: 1.5rem;
+    }
+    .cocktail-ingredients {
+      list-style: none; border-top: 1px solid rgba(201,168,76,0.1);
+      padding-top: 1.2rem;
+    }
+    .cocktail-ingredients li {
+      font-size: 0.65rem; letter-spacing: 0.2em;
+      text-transform: uppercase; line-height: 2.2;
+      opacity: 0.45;
+    }
+
+    /* ─── AR SECTION ──────────────────────────────────── */
+    #ar-section { padding: 10rem 0; text-align: center; }
+    .ar-eyebrow {
+      font-size: 0.65rem; letter-spacing: 0.55em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 1.5rem; opacity: 0; transform: translateY(18px);
+    }
+    .ar-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 10vw, 9rem);
+      line-height: 0.85; color: var(--cream);
+      opacity: 0; transform: translateY(40px); margin-bottom: 2rem;
+    }
+    .ar-body {
+      font-size: clamp(0.9rem, 1.4vw, 1.1rem);
+      font-style: italic; line-height: 2; color: var(--dim);
+      max-width: 480px; margin: 0 auto 3rem;
+      opacity: 0; transform: translateY(18px);
+    }
+    .ar-cta {
+      display: inline-block; padding: 1.1rem 4rem;
+      border: 1px solid rgba(201,168,76,0.5);
+      font-size: 0.65rem; letter-spacing: 0.5em;
+      text-transform: uppercase; color: var(--gold);
+      text-decoration: none;
+      transition: background 0.3s, color 0.3s;
+      opacity: 0; transform: translateY(18px);
+    }
+    .ar-cta:hover { background: var(--gold); color: var(--navy); }
+
+    /* ─── ECLIPSE FINAL ───────────────────────────────── */
+    #eclipse-final { padding: 10rem 0; text-align: center; }
+    .eclipse-title-final {
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(6rem, 26vw, 24rem);
-      line-height: 0.8;
-      letter-spacing: -0.01em;
-      text-transform: uppercase;
-      opacity: 0;
-      transform: translateY(50px);
+      line-height: 0.8; letter-spacing: -0.01em;
       background: linear-gradient(150deg, #ede6d6 0%, #c9a84c 45%, #7a4e18 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; opacity: 0; transform: translateY(50px);
     }
-    .eclipse-sub {
-      margin-top: 1.8rem;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.75rem;
-      font-style: italic;
-      letter-spacing: 0.4em;
-      opacity: 0;
-      transform: translateY(16px);
-      color: var(--dim);
-    }
-    .eclipse-cta {
-      display: inline-block;
-      margin-top: 3rem;
-      padding: 1rem 3rem;
-      border: 1px solid rgba(201,168,76,0.4);
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 0.65rem;
-      letter-spacing: 0.5em;
-      text-transform: uppercase;
-      color: var(--gold);
-      opacity: 0;
-      transform: translateY(16px);
-      pointer-events: auto;
-      cursor: pointer;
-      transition: background 0.3s, color 0.3s;
-    }
-    .eclipse-cta:hover {
-      background: var(--gold);
-      color: var(--navy);
+    .eclipse-sub-final {
+      margin-top: 1.8rem; font-size: 0.75rem;
+      font-style: italic; letter-spacing: 0.4em;
+      opacity: 0; transform: translateY(16px); color: var(--dim);
     }
 
-    /* ─── Horizontal rule ─────────────────────────── */
-    .section-hr {
-      position: absolute;
-      bottom: 0; left: 3rem; right: 3rem;
-      height: 1px;
-      background: rgba(201,168,76,0.12);
+    /* ─── FOOTER ──────────────────────────────────────── */
+    footer {
+      position: relative; z-index: 3;
+      border-top: 1px solid rgba(201,168,76,0.12);
+      padding: 4rem 3rem 2rem;
+    }
+    .footer-top {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem; margin-bottom: 4rem;
+    }
+    .footer-brand .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem; letter-spacing: 0.12em;
+      color: var(--cream); margin-bottom: 1rem; display: block;
+    }
+    .footer-brand .footer-logo span { color: var(--gold); }
+    .footer-brand p {
+      font-size: 0.7rem; font-style: italic;
+      line-height: 2; color: var(--dim); max-width: 260px;
+    }
+    .footer-col h4 {
+      font-size: 0.55rem; letter-spacing: 0.5em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 1.5rem; opacity: 0.8;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 0.8rem; }
+    .footer-col ul a {
+      font-size: 0.7rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--cream);
+      text-decoration: none; opacity: 0.4;
+      transition: opacity 0.2s;
+    }
+    .footer-col ul a:hover { opacity: 0.9; }
+    .footer-social { display: flex; gap: 1.2rem; margin-top: 0.5rem; }
+    .footer-social a {
+      font-size: 0.6rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--cream);
+      text-decoration: none; opacity: 0.35;
+      transition: opacity 0.2s;
+    }
+    .footer-social a:hover { opacity: 0.9; }
+    .footer-bottom {
+      display: flex; justify-content: space-between;
+      align-items: center; padding-top: 2rem;
+      border-top: 1px solid rgba(201,168,76,0.08);
+    }
+    .footer-legal {
+      font-size: 0.55rem; letter-spacing: 0.15em;
+      opacity: 0.25; line-height: 1.8;
+    }
+    .footer-copy {
+      font-size: 0.55rem; letter-spacing: 0.2em;
+      text-transform: uppercase; opacity: 0.2;
     }
   </style>
 </head>
 <body>
 
-<!-- Loading -->
+<!-- Age Gate -->
+<div id="age-gate">
+  <div class="ag-logo">Mount <span>Gay</span></div>
+  <div class="ag-sub">Barbados Rum · Est. 1703</div>
+  <p class="ag-question">Avez-vous l'âge légal pour consommer de l'alcool<br>dans votre pays de résidence ?</p>
+  <div class="ag-buttons">
+    <button class="ag-btn primary" id="ag-yes">Oui</button>
+    <button class="ag-btn" id="ag-no">Non</button>
+  </div>
+  <p class="ag-legal">L'abus d'alcool est dangereux pour la santé.<br>À consommer avec modération.</p>
+</div>
+
+<!-- Loader -->
 <div id="loader">
   <div class="loader-eyebrow">Mount Gay · Eclipse · Est. 1703</div>
   <div class="loader-counter" id="loader-counter">0</div>
@@ -413,84 +502,204 @@
 <div class="grain"></div>
 
 <!-- Nav -->
-<nav>
-  <div class="nav-logo">
-    Mount Gay<br>
-    <span>Barbados Rum</span>
-  </div>
-  <div class="nav-right">
-    Est. 1703<br>
-    Eclipse<br>
-    Heritage Blend
-  </div>
+<nav id="main-nav">
+  <a href="#hero" class="nav-logo">Mount <span>Gay</span></a>
+  <ul class="nav-links">
+    <li><a href="#product">L'Eclipse</a></li>
+    <li><a href="#origins">Origines</a></li>
+    <li><a href="#heritage">Héritage</a></li>
+    <li><a href="#cocktails">Cocktails</a></li>
+    <li><a href="#ar-section">Expérience AR</a></li>
+  </ul>
+  <a href="#ar-section" class="nav-cta">Découvrir</a>
 </nav>
 
-<!-- Scroll content -->
-<div id="scroll-container">
+<!-- HERO -->
+<section class="section" id="hero">
+  <div class="hero-ghost">ECLIPSE</div>
+  <div class="hero-top-left">
+    <h1>Mount <span>Gay</span></h1>
+  </div>
+  <div class="hero-top-right">
+    <p>Est. 1703</p>
+    <p>Eclipse</p>
+    <p>Barbados Rum</p>
+  </div>
+  <div class="hero-bottom-left">
+    <p>The World's Oldest Rum Distillery</p>
+  </div>
+  <div class="scroll-indicator"><span>Scroll</span></div>
+  <div class="section-hr"></div>
+</section>
 
-  <!-- Hero -->
-  <section class="section" id="hero">
-    <!-- Ghost text derrière la bouteille -->
-    <div class="hero-ghost">ECLIPSE</div>
-
-    <!-- Labels périphériques -->
-    <div class="hero-top-left">
-      <h1>Mount <span>Gay</span></h1>
+<!-- PRODUCT -->
+<section class="section" id="product">
+  <div class="section-inner">
+    <div>
+      <div class="eyebrow" id="product-eyebrow">Le Produit</div>
+      <h2 class="product-title" id="product-title">Eclipse</h2>
     </div>
-    <div class="hero-top-right">
-      <p>Est. 1703</p>
-      <p>Eclipse</p>
-      <p>Barbados Rum</p>
-    </div>
-    <div class="hero-bottom-left">
-      <p>The World's Oldest Rum Distillery</p>
-    </div>
-    <div class="scroll-indicator"><span>Scroll</span></div>
-    <div class="section-hr"></div>
-  </section>
-
-  <!-- Origins -->
-  <section class="section" id="origins">
-    <div class="content">
-      <div class="origins-eyebrow" id="origins-eyebrow">The Birthplace of Rum</div>
-      <h2 class="origins-title" id="origins-title">Barbados</h2>
-      <div class="origins-meta">
-        <div class="origins-coords" id="origins-coords">13°10'N · 59°32'W</div>
-        <div class="origins-body" id="origins-body">
-          The island that gave birth to rum.<br>
-          Over 320 years of uninterrupted distillation.
+    <div class="product-body" id="product-body">
+      <p>Un assemblage d'exception né des terres coralliennes de la Barbade. L'Eclipse capture l'essence de 320 ans de distillation ininterrompue — vif, aromatique, inimitable.</p>
+      <div class="tasting-grid">
+        <div class="tasting-note">
+          <div class="label">Nez</div>
+          <div class="value">Vanille, agrumes, fleurs blanches</div>
+        </div>
+        <div class="tasting-note">
+          <div class="label">Bouche</div>
+          <div class="value">Épices douces, caramel, bois</div>
+        </div>
+        <div class="tasting-note">
+          <div class="label">Finale</div>
+          <div class="value">Longue, légèrement fumée</div>
+        </div>
+        <div class="tasting-note">
+          <div class="label">Degré</div>
+          <div class="value">40% Vol.</div>
         </div>
       </div>
     </div>
-    <div class="section-hr"></div>
-  </section>
+  </div>
+  <div class="section-hr"></div>
+</section>
 
-  <!-- Heritage -->
-  <section class="section" id="heritage">
-    <div class="content">
-      <div class="heritage-eyebrow" id="heritage-eyebrow">Unbroken Since</div>
-      <h2 class="heritage-year" id="heritage-year">1703</h2>
-      <div class="heritage-body" id="heritage-body">
-        From the coral-limestone soils of Barbados,<br>
-        a legacy distilled through centuries.
+<!-- ORIGINS -->
+<section class="section" id="origins">
+  <div class="section-inner">
+    <div class="eyebrow" id="origins-eyebrow">The Birthplace of Rum</div>
+    <h2 class="origins-title" id="origins-title">Barbados</h2>
+    <div class="origins-meta">
+      <div class="origins-coords" id="origins-coords">13°10'N · 59°32'W</div>
+      <p class="origins-body" id="origins-body">L'île qui a donné naissance au rhum. Plus de 320 ans de distillation ininterrompue sur des sols coralliens uniques au monde — là où tout a commencé.</p>
+    </div>
+  </div>
+  <div class="section-hr"></div>
+</section>
+
+<!-- HERITAGE -->
+<section class="section" id="heritage">
+  <div class="section-inner" style="text-align:right">
+    <div class="eyebrow" id="heritage-eyebrow" style="text-align:right">Unbroken Since</div>
+    <h2 class="heritage-year" id="heritage-year">1703</h2>
+    <p class="heritage-body" id="heritage-body">Des sols de calcaire corallien de la Barbade, un héritage distillé à travers les siècles. Mount Gay, la plus ancienne distillerie de rhum au monde encore en activité.</p>
+  </div>
+  <div class="section-hr"></div>
+</section>
+
+<!-- COCKTAILS -->
+<section class="section" id="cocktails">
+  <div class="section-inner" style="padding-top:6rem;padding-bottom:6rem">
+    <div class="cocktails-header">
+      <div>
+        <div class="eyebrow" id="cocktails-eyebrow">Mixologie</div>
+        <h2 class="cocktails-title" id="cocktails-title">Cocktails<br>Signature</h2>
+      </div>
+      <a href="#" class="cocktails-link" id="cocktails-link">Voir toutes les recettes</a>
+    </div>
+    <div class="cocktails-grid">
+      <div class="cocktail-card" id="cocktail-1">
+        <div class="cocktail-num">01</div>
+        <h3 class="cocktail-name">Eclipse &amp; Tonic</h3>
+        <p class="cocktail-desc">Fraîcheur tropicale et légèreté. Le cocktail emblématique de l'été à la Barbade.</p>
+        <ul class="cocktail-ingredients">
+          <li>5 cl Mount Gay Eclipse</li>
+          <li>15 cl Tonic Water</li>
+          <li>Zeste de lime · Glaçons</li>
+        </ul>
+      </div>
+      <div class="cocktail-card" id="cocktail-2">
+        <div class="cocktail-num">02</div>
+        <h3 class="cocktail-name">Eclipse Sour</h3>
+        <p class="cocktail-desc">L'acidité du citron rencontre la douceur du rhum. Un équilibre parfait entre vif et rond.</p>
+        <ul class="cocktail-ingredients">
+          <li>5 cl Mount Gay Eclipse</li>
+          <li>2 cl Jus de citron</li>
+          <li>1,5 cl Sirop de canne · Blanc d'œuf</li>
+        </ul>
+      </div>
+      <div class="cocktail-card" id="cocktail-3">
+        <div class="cocktail-num">03</div>
+        <h3 class="cocktail-name">1703 Old Fashioned</h3>
+        <p class="cocktail-desc">Un hommage à l'histoire. Complexe, profond, intemporel — comme la distillerie elle-même.</p>
+        <ul class="cocktail-ingredients">
+          <li>6 cl Mount Gay Eclipse</li>
+          <li>2 traits Angostura Bitters</li>
+          <li>1 sucre · Zeste d'orange</li>
+        </ul>
       </div>
     </div>
-    <div class="section-hr"></div>
-  </section>
+  </div>
+  <div class="section-hr"></div>
+</section>
 
-  <!-- Eclipse -->
-  <section class="section" id="eclipse-section">
-    <div class="content">
-      <div class="eclipse-eyebrow" id="eclipse-eyebrow">Mount Gay · Barbados</div>
-      <h2 class="eclipse-title" id="eclipse-title">Eclipse</h2>
-      <div class="eclipse-sub" id="eclipse-sub">Crafted for those who seek the extraordinary</div>
-      <a class="eclipse-cta" id="eclipse-cta" href="experience.html">Discover the AR Experience</a>
+<!-- AR EXPERIENCE -->
+<section class="section" id="ar-section" style="justify-content:center">
+  <div style="text-align:center;width:100%;padding:0 3rem">
+    <div class="ar-eyebrow" id="ar-eyebrow">Technologie · WebAR</div>
+    <h2 class="ar-title" id="ar-title">Expérience<br>Augmentée</h2>
+    <p class="ar-body" id="ar-body">Pointez votre smartphone sur la bouteille. La carte au trésor de la Barbade se déploie en réalité augmentée — sans application, directement depuis votre navigateur.</p>
+    <a href="experience.html" class="ar-cta" id="ar-cta">Lancer l'expérience AR</a>
+  </div>
+  <div class="section-hr"></div>
+</section>
+
+<!-- ECLIPSE FINAL -->
+<section class="section" id="eclipse-final" style="justify-content:center">
+  <div style="text-align:center;width:100%;padding:0 1rem">
+    <div class="eyebrow" id="ef-eyebrow" style="text-align:center">Mount Gay · Barbados</div>
+    <h2 class="eclipse-title-final" id="ef-title">Eclipse</h2>
+    <p class="eclipse-sub-final" id="ef-sub">Crafted for those who seek the extraordinary</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <span class="footer-logo">Mount <span>Gay</span></span>
+      <p>La plus ancienne distillerie de rhum au monde. Barbados, depuis 1703.</p>
+      <div class="footer-social" style="margin-top:1.5rem">
+        <a href="#">Instagram</a>
+        <a href="#">Facebook</a>
+        <a href="#">YouTube</a>
+      </div>
     </div>
-  </section>
+    <div class="footer-col">
+      <h4>Le Rhum</h4>
+      <ul>
+        <li><a href="#product">Eclipse</a></li>
+        <li><a href="#">XO Reserve</a></li>
+        <li><a href="#">Black Barrel</a></li>
+        <li><a href="#">1703</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Découvrir</h4>
+      <ul>
+        <li><a href="#origins">Origines</a></li>
+        <li><a href="#heritage">Héritage</a></li>
+        <li><a href="#cocktails">Cocktails</a></li>
+        <li><a href="#ar-section">Expérience AR</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Informations</h4>
+      <ul>
+        <li><a href="#">Mentions légales</a></li>
+        <li><a href="#">Confidentialité</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">Rémy Cointreau</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-legal">L'abus d'alcool est dangereux pour la santé. À consommer avec modération.<br>La vente d'alcool est interdite aux mineurs.</p>
+    <p class="footer-copy">© Mount Gay Distilleries 2026</p>
+  </div>
+</footer>
 
-</div>
-
-<!-- Scripts (synchrones — doivent être disponibles avant le module) -->
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
@@ -509,15 +718,32 @@ import * as THREE from 'three';
 import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
-gsap.registerPlugin(ScrollTrigger);
+// ─── AGE GATE ─────────────────────────────────────────
+const ageGate = document.getElementById('age-gate');
+document.getElementById('ag-yes').addEventListener('click', () => {
+  ageGate.classList.add('hidden');
+  setTimeout(() => { ageGate.style.display = 'none'; }, 700);
+});
+document.getElementById('ag-no').addEventListener('click', () => {
+  window.location.href = 'https://www.responsiblebusiness.org/';
+});
 
-// ─── LENIS SMOOTH SCROLL ──────────────────────────────────────────
+// ─── GSAP + SCROLL ────────────────────────────────────
+gsap.registerPlugin(ScrollTrigger);
 const lenis = new Lenis({ lerp: 0.08, smoothWheel: true });
 lenis.on('scroll', ScrollTrigger.update);
 gsap.ticker.add((time) => { lenis.raf(time * 1000); });
 gsap.ticker.lagSmoothing(0);
 
-// ─── RENDERER ────────────────────────────────────────────────────
+// ─── NAV SCROLL STATE ─────────────────────────────────
+const nav = document.getElementById('main-nav');
+ScrollTrigger.create({
+  start: '100px top',
+  onEnter: () => nav.classList.add('scrolled'),
+  onLeaveBack: () => nav.classList.remove('scrolled'),
+});
+
+// ─── THREE.JS ─────────────────────────────────────────
 const canvas  = document.getElementById('three-canvas');
 const W = () => window.innerWidth;
 const H = () => window.innerHeight;
@@ -533,7 +759,7 @@ const scene = new THREE.Scene();
 const cam = new THREE.PerspectiveCamera(40, W() / H(), 0.1, 100);
 cam.position.set(0, 0, 5);
 
-// ─── BACKGROUND SHADER — BLEU NUIT + HALO AMBRE ──────────────────
+// Background shader
 const bgMat = new THREE.ShaderMaterial({
   depthWrite: false,
   uniforms: {
@@ -546,61 +772,40 @@ const bgMat = new THREE.ShaderMaterial({
     uniform float uProgress;
     uniform float uTime;
     uniform vec2  uRes;
-
-    // Palette bleu nuit profond
-    vec3 c0 = vec3(0.024, 0.043, 0.078);  // bleu nuit base
-    vec3 c1 = vec3(0.018, 0.032, 0.065);  // bleu nuit plus sombre
-    vec3 c2 = vec3(0.028, 0.050, 0.090);  // bleu nuit légèrement plus clair
-
-    // Halos ambre / or doux
-    vec3 g0 = vec3(0.200, 0.130, 0.030);  // halo ambre sombre
-    vec3 g1 = vec3(0.120, 0.090, 0.020);  // halo or subtil
-    vec3 g2 = vec3(0.260, 0.160, 0.035);  // halo ambre plus chaud
-
+    vec3 c0 = vec3(0.024, 0.043, 0.078);
+    vec3 c1 = vec3(0.018, 0.032, 0.065);
+    vec3 c2 = vec3(0.028, 0.050, 0.090);
+    vec3 g0 = vec3(0.200, 0.130, 0.030);
+    vec3 g1 = vec3(0.120, 0.090, 0.020);
+    vec3 g2 = vec3(0.260, 0.160, 0.035);
     void main() {
       vec2 uv = gl_FragCoord.xy / uRes;
       vec2 p  = uv - vec2(0.5, 0.38);
       float d = length(p);
-
       float breathe = sin(uTime * 0.35) * 0.035 + 1.0;
-
-      float t = clamp(uProgress, 0.0, 1.0);
-      float s = clamp(uProgress - 1.0, 0.0, 1.0);
-
-      vec3 bg   = mix(mix(c0, c1, t), c2, s);
-      vec3 glow = mix(mix(g0, g1, t), g2, s);
-
+      float prog = clamp(uProgress, 0.0, 1.0);
+      float prog2 = clamp(uProgress - 1.0, 0.0, 1.0);
+      vec3 bg   = mix(mix(c0, c1, prog), c2, prog2);
+      vec3 glow = mix(mix(g0, g1, prog), g2, prog2);
       float halo = (1.0 - smoothstep(0.0, 0.90 * breathe, d)) * 0.45;
       vec3 col = bg + glow * halo;
-
-      // Vignette
-      float vig = 1.0 - smoothstep(0.45, 1.2, length(uv - 0.5));
-      col *= vig;
-
+      col *= 1.0 - smoothstep(0.45, 1.2, length(uv - 0.5));
       gl_FragColor = vec4(col, 1.0);
     }
   `
 });
-const bgMesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat);
-bgMesh.renderOrder = -1;
-scene.add(bgMesh);
+scene.add(Object.assign(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat), { renderOrder: -1 }));
 
-// ─── LIGHTING ─────────────────────────────────────────────────────
+// Lighting
 scene.add(new THREE.AmbientLight(0xd0c0a0, 0.4));
-
 const key = new THREE.DirectionalLight(0xffd060, 3.5);
-key.position.set(2, 3, 4);
-scene.add(key);
-
+key.position.set(2, 3, 4); scene.add(key);
 const fill = new THREE.DirectionalLight(0x2040a0, 0.8);
-fill.position.set(-3, 0, 1);
-scene.add(fill);
-
+fill.position.set(-3, 0, 1); scene.add(fill);
 const rim = new THREE.DirectionalLight(0xffb020, 2.2);
-rim.position.set(0.5, -3, -2);
-scene.add(rim);
+rim.position.set(0.5, -3, -2); scene.add(rim);
 
-// ─── BOTTLE ───────────────────────────────────────────────────────
+// Bottle
 let bottle = null;
 const clock = new THREE.Clock();
 const scrollState = { rotY: 0, posY: 0 };
@@ -612,149 +817,89 @@ const mtlLoader = new MTLLoader();
 mtlLoader.setPath(OBJ_BASE);
 mtlLoader.load(OBJ_NAME + '.mtl', (materials) => {
   materials.preload();
-
   const objLoader = new OBJLoader();
   objLoader.setMaterials(materials);
   objLoader.setPath(OBJ_BASE);
-  objLoader.load(
-    OBJ_NAME + '.obj',
-    (obj) => {
-      bottle = obj;
+  objLoader.load(OBJ_NAME + '.obj', (obj) => {
+    bottle = obj;
+    const box = new THREE.Box3().setFromObject(bottle);
+    const size = box.getSize(new THREE.Vector3());
+    const ctr  = box.getCenter(new THREE.Vector3());
+    const sc   = 2.8 / Math.max(size.x, size.y, size.z);
+    bottle.scale.setScalar(sc);
+    bottle.position.copy(ctr.multiplyScalar(-sc));
+    scene.add(bottle);
+    bottle.scale.setScalar(0);
+    gsap.to(bottle.scale, { x: sc, y: sc, z: sc, duration: 2.0, ease: 'back.out(1.1)', delay: 0.4 });
 
-      const box  = new THREE.Box3().setFromObject(bottle);
-      const size = box.getSize(new THREE.Vector3());
-      const ctr  = box.getCenter(new THREE.Vector3());
-      const sc   = 2.8 / Math.max(size.x, size.y, size.z);
-
-      bottle.scale.setScalar(sc);
-      bottle.position.copy(ctr.multiplyScalar(-sc));
-
-      scene.add(bottle);
-
-      bottle.scale.setScalar(0);
-      gsap.to(bottle.scale, { x: sc, y: sc, z: sc, duration: 2.0, ease: 'back.out(1.1)', delay: 0.4 });
-
-      ScrollTrigger.create({
-        trigger: '#scroll-container',
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 2.5,
-        onUpdate: (s) => {
-          scrollState.rotY = s.progress * Math.PI * 2;
-          scrollState.posY = -s.progress * 0.6;
-        }
-      });
-
-      finishLoader();
-    },
-    (xhr) => { if (xhr.total) updateLoader(xhr.loaded / xhr.total); }
-  );
+    ScrollTrigger.create({
+      trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 2.5,
+      onUpdate: (s) => {
+        scrollState.rotY = s.progress * Math.PI * 2;
+        scrollState.posY = -s.progress * 0.6;
+      }
+    });
+    finishLoader();
+  }, (xhr) => { if (xhr.total) updateLoader(xhr.loaded / xhr.total); });
 });
 
-// ─── LOADER COUNTER ───────────────────────────────────────────────
-const counterEl = document.getElementById('loader-counter');
-const lineEl    = document.getElementById('loader-line');
-let loadVal = 0;
-let targetVal = 0;
-let loaderDone = false;
-
-function updateLoader(pct) {
-  targetVal = Math.round(pct * 100);
-  lineEl.style.width = targetVal + '%';
-}
-
-function tickCounter() {
-  if (loadVal < targetVal) {
-    loadVal = Math.min(loadVal + 2, targetVal);
-    counterEl.textContent = String(loadVal).padStart(2, '0');
-    requestAnimationFrame(tickCounter);
-  }
-}
-requestAnimationFrame(tickCounter);
-
-function finishLoader() {
-  if (loaderDone) return;
-  loaderDone = true;
-  targetVal = 100;
-  lineEl.style.width = '100%';
-
-  function toHundred() {
-    if (loadVal < 100) {
-      loadVal = Math.min(loadVal + 3, 100);
-      counterEl.textContent = String(loadVal).padStart(2, '0');
-      requestAnimationFrame(toHundred);
-    } else {
-      setTimeout(() => {
-        document.getElementById('loader').classList.add('hidden');
-      }, 350);
-    }
-  }
-  toHundred();
-}
-
-// ─── SCROLL → BACKGROUND ──────────────────────────────────────────
+// Background progress
 ScrollTrigger.create({
-  trigger: '#origins',
-  start: 'top bottom',
-  end: 'top top',
-  scrub: 2,
+  trigger: '#origins', start: 'top bottom', end: 'top top', scrub: 2,
   onUpdate: s => { bgMat.uniforms.uProgress.value = s.progress; }
 });
 ScrollTrigger.create({
-  trigger: '#heritage',
-  start: 'top bottom',
-  end: 'top top',
-  scrub: 2,
+  trigger: '#heritage', start: 'top bottom', end: 'top top', scrub: 2,
   onUpdate: s => { bgMat.uniforms.uProgress.value = 1 + s.progress; }
 });
 
-// ─── TEXT REVEALS ─────────────────────────────────────────────────
-gsap.timeline({
-  scrollTrigger: { trigger: '#origins', start: 'top 65%', end: 'top 20%', scrub: 1 }
-})
-.to('#origins-eyebrow', { opacity: 1, y: 0, duration: 1 })
-.to('#origins-title',   { opacity: 1, y: 0, duration: 1 }, 0.1)
-.to('#origins-coords',  { opacity: 1, y: 0, duration: 1 }, 0.25)
-.to('#origins-body',    { opacity: 1, y: 0, duration: 1 }, 0.35);
+// ─── LOADER ───────────────────────────────────────────
+const counterEl = document.getElementById('loader-counter');
+const lineEl    = document.getElementById('loader-line');
+let loadVal = 0, targetVal = 0, loaderDone = false;
+function updateLoader(pct) { targetVal = Math.round(pct * 100); lineEl.style.width = targetVal + '%'; }
+(function tickCounter() {
+  if (loadVal < targetVal) { loadVal = Math.min(loadVal + 2, targetVal); counterEl.textContent = String(loadVal).padStart(2, '0'); }
+  requestAnimationFrame(tickCounter);
+})();
+function finishLoader() {
+  if (loaderDone) return; loaderDone = true; targetVal = 100; lineEl.style.width = '100%';
+  (function toHundred() {
+    if (loadVal < 100) { loadVal = Math.min(loadVal + 3, 100); counterEl.textContent = String(loadVal).padStart(2, '0'); requestAnimationFrame(toHundred); }
+    else { setTimeout(() => document.getElementById('loader').classList.add('hidden'), 350); }
+  })();
+}
 
-gsap.timeline({
-  scrollTrigger: { trigger: '#heritage', start: 'top 65%', end: 'top 20%', scrub: 1 }
-})
-.to('#heritage-eyebrow', { opacity: 1, y: 0, duration: 1 })
-.to('#heritage-year',    { opacity: 1, y: 0, duration: 1 }, 0.1)
-.to('#heritage-body',    { opacity: 1, y: 0, duration: 1 }, 0.3);
+// ─── SCROLL REVEALS ───────────────────────────────────
+function reveal(ids, trigger, stagger = 0.12) {
+  const tl = gsap.timeline({ scrollTrigger: { trigger, start: 'top 70%', end: 'top 25%', scrub: 1 } });
+  ids.forEach((id, i) => tl.to('#' + id, { opacity: 1, y: 0, duration: 1 }, i * stagger));
+}
+reveal(['product-eyebrow', 'product-title', 'product-body'], '#product');
+reveal(['origins-eyebrow', 'origins-title', 'origins-coords', 'origins-body'], '#origins');
+reveal(['heritage-eyebrow', 'heritage-year', 'heritage-body'], '#heritage');
+reveal(['cocktails-eyebrow', 'cocktails-title', 'cocktails-link', 'cocktail-1', 'cocktail-2', 'cocktail-3'], '#cocktails');
+reveal(['ar-eyebrow', 'ar-title', 'ar-body', 'ar-cta'], '#ar-section');
+reveal(['ef-eyebrow', 'ef-title', 'ef-sub'], '#eclipse-final');
 
-gsap.timeline({
-  scrollTrigger: { trigger: '#eclipse-section', start: 'top 65%', end: 'top 20%', scrub: 1 }
-})
-.to('#eclipse-eyebrow', { opacity: 1, y: 0, duration: 1 })
-.to('#eclipse-title',   { opacity: 1, y: 0, duration: 1 }, 0.1)
-.to('#eclipse-sub',     { opacity: 1, y: 0, duration: 1 }, 0.25)
-.to('#eclipse-cta',     { opacity: 1, y: 0, duration: 1 }, 0.4);
-
-// ─── RENDER LOOP ──────────────────────────────────────────────────
+// ─── RENDER LOOP ──────────────────────────────────────
 let elapsed = 0;
 (function loop() {
   requestAnimationFrame(loop);
   const dt = clock.getDelta();
   elapsed += dt;
-
   bgMat.uniforms.uTime.value = elapsed;
-
   if (bottle) {
     bottle.position.y = scrollState.posY + Math.sin(elapsed * 0.65) * 0.045;
     bottle.rotation.y = scrollState.rotY + elapsed * 0.22;
   }
-
   renderer.render(scene, cam);
 })();
 
-// ─── RESIZE ───────────────────────────────────────────────────────
+// ─── RESIZE ───────────────────────────────────────────
 window.addEventListener('resize', () => {
-  cam.aspect = W() / H();
-  cam.updateProjectionMatrix();
-  renderer.setSize(W(), H());
-  bgMat.uniforms.uRes.value.set(W(), H());
+  cam.aspect = W() / H(); cam.updateProjectionMatrix();
+  renderer.setSize(W(), H()); bgMat.uniforms.uRes.value.set(W(), H());
 });
 </script>
 
