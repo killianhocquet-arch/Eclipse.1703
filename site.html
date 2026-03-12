@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mount Gay Eclipse — Est. 1703</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --gold: #c9a84c;
+      --cream: #f0e8d8;
+      --dark: #080604;
+    }
+
+    html { scroll-behavior: auto; }
+
+    body {
+      background: var(--dark);
+      color: var(--cream);
+      font-family: 'Space Mono', monospace;
+      overflow-x: hidden;
+    }
+
+    /* ─── Canvas ────────────────────────────────── */
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    canvas { display: block; }
+
+    /* ─── Grain ─────────────────────────────────── */
+    .grain {
+      position: fixed;
+      inset: -50%;
+      width: 200%;
+      height: 200%;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain-shift 0.5s steps(1) infinite;
+    }
+
+    @keyframes grain-shift {
+      0%   { transform: translate(0,   0);   }
+      25%  { transform: translate(-2%, -1%); }
+      50%  { transform: translate(1%,  2%);  }
+      75%  { transform: translate(2%, -2%);  }
+      100% { transform: translate(-1%, 1%);  }
+    }
+
+    /* ─── Nav ───────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 2rem 2.5rem;
+      pointer-events: none;
+      mix-blend-mode: normal;
+    }
+
+    .nav-logo {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      line-height: 1.6;
+      text-transform: uppercase;
+    }
+
+    .nav-logo span { color: var(--gold); font-size: 0.6rem; }
+
+    .nav-right {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-align: right;
+      line-height: 2;
+      opacity: 0.5;
+    }
+
+    /* ─── Scroll container ──────────────────────── */
+    #scroll-container {
+      position: relative;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .section {
+      height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ─── Section 1 · Hero ──────────────────────── */
+    #hero .left {
+      position: absolute;
+      left: 2.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .hero-title {
+      font-size: clamp(3.5rem, 9vw, 8rem);
+      font-weight: 700;
+      line-height: 0.88;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+    }
+
+    .hero-title span { display: block; }
+
+    #hero .right {
+      position: absolute;
+      right: 2.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      text-align: right;
+    }
+
+    .hero-year {
+      color: var(--gold);
+      font-size: clamp(1rem, 2.5vw, 1.8rem);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+    }
+
+    .hero-desc {
+      margin-top: 0.8rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      opacity: 0.4;
+      line-height: 2;
+    }
+
+    .hero-bottom {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.6rem;
+      letter-spacing: 0.4em;
+      opacity: 0.3;
+      white-space: nowrap;
+    }
+
+    .scroll-line {
+      position: absolute;
+      bottom: 2rem;
+      right: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      opacity: 0.25;
+      writing-mode: vertical-rl;
+    }
+
+    .scroll-line::after {
+      content: '';
+      display: block;
+      width: 1px;
+      height: 40px;
+      background: var(--cream);
+      opacity: 0.4;
+    }
+
+    /* ─── Section 2 · Origins ───────────────────── */
+    #origins .content {
+      text-align: center;
+      width: 100%;
+      padding: 0 1.5rem;
+    }
+
+    .origins-eyebrow {
+      font-size: 0.6rem;
+      letter-spacing: 0.5em;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .origins-title {
+      font-size: clamp(5rem, 18vw, 16rem);
+      font-weight: 700;
+      line-height: 0.82;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .origins-coords {
+      margin-top: 2rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      color: var(--gold);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .origins-body {
+      margin-top: 1rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      opacity: 0;
+      transform: translateY(20px);
+      line-height: 2;
+      color: rgba(240,232,216,0.5);
+    }
+
+    /* ─── Section 3 · Eclipse ───────────────────── */
+    #eclipse-section .content {
+      text-align: center;
+      width: 100%;
+    }
+
+    .eclipse-eyebrow {
+      font-size: 0.6rem;
+      letter-spacing: 0.5em;
+      color: var(--gold);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .eclipse-title {
+      font-size: clamp(5rem, 22vw, 20rem);
+      font-weight: 700;
+      line-height: 0.8;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(40px);
+      background: linear-gradient(160deg, #f0e8d8 0%, #c9a84c 50%, #8a5c1e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .eclipse-sub {
+      margin-top: 1.5rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.5em;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    /* ─── Loading screen ────────────────────────── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1.5rem;
+      transition: opacity 0.8s ease;
+    }
+
+    #loader .loader-logo {
+      font-size: 0.7rem;
+      letter-spacing: 0.4em;
+      opacity: 0.6;
+    }
+
+    #loader .loader-bar-bg {
+      width: 120px;
+      height: 1px;
+      background: rgba(240,232,216,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #loader .loader-bar {
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      width: 0%;
+      background: var(--gold);
+      transition: width 0.3s ease;
+    }
+
+    #loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loader">
+  <div class="loader-logo">MOUNT GAY · ECLIPSE</div>
+  <div class="loader-bar-bg">
+    <div class="loader-bar" id="loader-bar"></div>
+  </div>
+</div>
+
+<!-- Canvas Three.js -->
+<div id="canvas-container">
+  <canvas id="three-canvas"></canvas>
+</div>
+
+<!-- Grain -->
+<div class="grain"></div>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-logo">
+    MOUNT GAY<br>
+    <span>BARBADOS RUM</span>
+  </div>
+  <div class="nav-right">
+    EST. 1703<br>
+    ECLIPSE<br>
+    HERITAGE BLEND
+  </div>
+</nav>
+
+<!-- Scroll content -->
+<div id="scroll-container">
+
+  <!-- Hero -->
+  <section class="section" id="hero">
+    <div class="left">
+      <h1 class="hero-title" id="hero-title">
+        <span>MOUNT</span>
+        <span>GAY</span>
+      </h1>
+    </div>
+    <div class="right">
+      <div class="hero-year">EST.<br>1703</div>
+      <div class="hero-desc">
+        BARBADOS · RUM<br>
+        HERITAGE BLEND<br>
+        CRISP & AROMATIC
+      </div>
+    </div>
+    <div class="hero-bottom">SCROLL TO EXPLORE</div>
+    <div class="scroll-line">SCROLL</div>
+  </section>
+
+  <!-- Origins -->
+  <section class="section" id="origins">
+    <div class="content">
+      <div class="origins-eyebrow" id="origins-eyebrow">THE BIRTHPLACE OF RUM</div>
+      <h2 class="origins-title" id="origins-title">BARBADOS</h2>
+      <div class="origins-coords" id="origins-coords">13°10'N · 59°32'W</div>
+      <div class="origins-body" id="origins-body">
+        The island that gave birth to rum.<br>
+        Over 320 years of uninterrupted distillation.
+      </div>
+    </div>
+  </section>
+
+  <!-- Eclipse -->
+  <section class="section" id="eclipse-section">
+    <div class="content">
+      <div class="eclipse-eyebrow" id="eclipse-eyebrow">MOUNT GAY · BARBADOS</div>
+      <h2 class="eclipse-title" id="eclipse-title">ECLIPSE</h2>
+      <div class="eclipse-sub" id="eclipse-sub">CRAFTED FOR THOSE WHO SEEK THE EXTRAORDINARY</div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Three.js + loaders -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.163.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ─── RENDERER ────────────────────────────────────────────────────
+const canvas  = document.getElementById('three-canvas');
+const W = () => window.innerWidth;
+const H = () => window.innerHeight;
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(W(), H());
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.3;
+
+const scene = new THREE.Scene();
+const cam = new THREE.PerspectiveCamera(40, W() / H(), 0.1, 100);
+cam.position.set(0, 0, 5);
+
+// ─── ATMOSPHERIC BACKGROUND SHADER ───────────────────────────────
+const bgMat = new THREE.ShaderMaterial({
+  depthWrite: false,
+  uniforms: {
+    uProgress: { value: 0.0 },
+    uTime:     { value: 0.0 },
+    uRes:      { value: new THREE.Vector2(W(), H()) },
+  },
+  vertexShader: `void main() { gl_Position = vec4(position.xy, 1.0, 1.0); }`,
+  fragmentShader: `
+    uniform float uProgress;
+    uniform float uTime;
+    uniform vec2  uRes;
+
+    // Palette : noir chaud | bleu nuit | ambre sombre
+    vec3 c0 = vec3(0.030, 0.022, 0.012);
+    vec3 c1 = vec3(0.016, 0.028, 0.055);
+    vec3 c2 = vec3(0.055, 0.034, 0.008);
+
+    vec3 g0 = vec3(0.320, 0.180, 0.040);  // halo ambre chaud
+    vec3 g1 = vec3(0.040, 0.080, 0.180);  // halo bleu nuit
+    vec3 g2 = vec3(0.380, 0.220, 0.040);  // halo or
+
+    float smin(float a, float b, float k) {
+      float h = clamp(0.5 + 0.5*(b-a)/k, 0.0, 1.0);
+      return mix(b, a, h) - k*h*(1.0-h);
+    }
+
+    void main() {
+      vec2 uv = gl_FragCoord.xy / uRes;
+      vec2 p  = uv - 0.5;
+      float d = length(p);
+
+      // Breathing glow
+      float breathe = sin(uTime * 0.4) * 0.04 + 1.0;
+
+      vec3 bg, glow;
+      float t = clamp(uProgress, 0.0, 1.0);
+      float s = clamp(uProgress - 1.0, 0.0, 1.0);
+
+      bg   = mix(mix(c0, c1, t), c2, s);
+      glow = mix(mix(g0, g1, t), g2, s);
+
+      float halo = (1.0 - smoothstep(0.0, 0.85 * breathe, d)) * 0.55;
+      vec3 col = bg + glow * halo;
+      col *= 1.0 - d * 0.35;
+
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `
+});
+const bgMesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat);
+bgMesh.renderOrder = -1;
+scene.add(bgMesh);
+
+// ─── LIGHTING ────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0xfff0d0, 0.5));
+
+const key = new THREE.DirectionalLight(0xffd070, 3.0);
+key.position.set(2, 3, 4);
+scene.add(key);
+
+const fill = new THREE.DirectionalLight(0x3050a0, 1.0);
+fill.position.set(-3, 0, 1);
+scene.add(fill);
+
+const rim = new THREE.DirectionalLight(0xffb030, 2.0);
+rim.position.set(0.5, -3, -2);
+scene.add(rim);
+
+// ─── BOTTLE ──────────────────────────────────────────────────────
+let bottle = null;
+let mixer  = null;
+const clock = new THREE.Clock();
+
+// Scroll state — séparé du idle pour pouvoir les combiner proprement
+const scrollState = { rotY: 0, posY: 0, scale: 1 };
+
+new THREE.GLTFLoader().load(
+  'assets/satanim3.glb',
+  (gltf) => {
+    bottle = gltf.scene;
+
+    // Centrer et normaliser
+    const box  = new THREE.Box3().setFromObject(bottle);
+    const size = box.getSize(new THREE.Vector3());
+    const ctr  = box.getCenter(new THREE.Vector3());
+    const sc   = 2.2 / Math.max(size.x, size.y, size.z);
+
+    bottle.scale.setScalar(sc);
+    bottle.position.copy(ctr.multiplyScalar(-sc));
+
+    // Animations intégrées au GLB
+    if (gltf.animations?.length) {
+      mixer = new THREE.AnimationMixer(bottle);
+      gltf.animations.forEach(c => mixer.clipAction(c).play());
+    }
+
+    scene.add(bottle);
+
+    // Intro
+    bottle.scale.setScalar(0);
+    gsap.to(bottle.scale, { x: sc, y: sc, z: sc, duration: 1.6, ease: 'back.out(1.4)', delay: 0.2 });
+
+    // Scroll : rotate + drift
+    ScrollTrigger.create({
+      trigger: '#scroll-container',
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 2.5,
+      onUpdate: (s) => {
+        scrollState.rotY = s.progress * Math.PI * 2;
+        scrollState.posY = -s.progress * 0.6;
+      }
+    });
+
+    // Loader out
+    document.getElementById('loader-bar').style.width = '100%';
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('hidden');
+    }, 400);
+  },
+  (xhr) => {
+    const pct = (xhr.loaded / xhr.total * 100).toFixed(0);
+    document.getElementById('loader-bar').style.width = pct + '%';
+  }
+);
+
+// ─── SCROLL → BACKGROUND ─────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '#origins',
+  start: 'top bottom',
+  end: 'top top',
+  scrub: 2,
+  onUpdate: s => { bgMat.uniforms.uProgress.value = s.progress; }
+});
+
+ScrollTrigger.create({
+  trigger: '#eclipse-section',
+  start: 'top bottom',
+  end: 'top top',
+  scrub: 2,
+  onUpdate: s => { bgMat.uniforms.uProgress.value = 1 + s.progress; }
+});
+
+// ─── SCROLL → TEXT REVEALS ───────────────────────────────────────
+gsap.timeline({
+  scrollTrigger: { trigger: '#origins', start: 'top 65%', end: 'top 25%', scrub: 1 }
+})
+.to('#origins-eyebrow', { opacity: 1, y: 0, duration: 1 })
+.to('#origins-title',   { opacity: 1, y: 0, duration: 1 }, 0.15)
+.to('#origins-coords',  { opacity: 1, y: 0, duration: 1 }, 0.3)
+.to('#origins-body',    { opacity: 1, y: 0, duration: 1 }, 0.45);
+
+gsap.timeline({
+  scrollTrigger: { trigger: '#eclipse-section', start: 'top 65%', end: 'top 25%', scrub: 1 }
+})
+.to('#eclipse-eyebrow', { opacity: 1, y: 0, duration: 1 })
+.to('#eclipse-title',   { opacity: 1, y: 0, duration: 1 }, 0.15)
+.to('#eclipse-sub',     { opacity: 1, y: 0, duration: 1 }, 0.35);
+
+// ─── RENDER LOOP ─────────────────────────────────────────────────
+let t = 0;
+(function loop() {
+  requestAnimationFrame(loop);
+  const dt = clock.getDelta();
+  t += dt;
+
+  bgMat.uniforms.uTime.value = t;
+  if (mixer) mixer.update(dt);
+
+  if (bottle) {
+    // Idle float
+    bottle.position.y = scrollState.posY + Math.sin(t * 0.7) * 0.04;
+    // Idle rotation + scroll rotation
+    bottle.rotation.y = scrollState.rotY + t * 0.25;
+  }
+
+  renderer.render(scene, cam);
+})();
+
+// ─── RESIZE ──────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  cam.aspect = W() / H();
+  cam.updateProjectionMatrix();
+  renderer.setSize(W(), H());
+  bgMat.uniforms.uRes.value.set(W(), H());
+});
+</script>
+
+</body>
+</html>
