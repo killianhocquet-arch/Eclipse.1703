@@ -298,6 +298,18 @@
       opacity: 0; transform: translateY(16px);
     }
 
+    /* ─── BARBADOS OVERLAY ────────────────────────────── */
+    #barbados-overlay {
+      position: fixed; inset: 0; z-index: 5;
+      pointer-events: none; opacity: 0;
+      transition: none;
+    }
+    #barbados-overlay::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(6,14,26,0.55) 0%, rgba(6,14,26,0) 40%, rgba(6,14,26,0) 60%, rgba(6,14,26,0.7) 100%);
+    }
+
     /* ─── HERITAGE ────────────────────────────────────── */
     #heritage { padding: 8rem 0; text-align: right; }
     .heritage-year {
@@ -370,35 +382,142 @@
       opacity: 0.45;
     }
 
-    /* ─── AR SECTION ──────────────────────────────────── */
-    #ar-section { padding: 10rem 0; text-align: center; }
-    .ar-eyebrow {
+    /* ─── CANE ─────────────────────────────────────────── */
+    #cane { padding: 8rem 0; }
+    .cane-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4.5rem, 16vw, 14rem);
+      line-height: 0.82; letter-spacing: 0.01em;
+      color: var(--cream); opacity: 0; transform: translateY(40px);
+    }
+    .cane-body {
+      max-width: 420px; margin-top: 2rem;
+      opacity: 0; transform: translateY(20px);
+    }
+    .cane-body p {
+      font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+      font-style: italic; line-height: 2; color: var(--dim);
+    }
+    .cane-stats {
+      display: flex; gap: 5rem; margin-top: 4rem;
+      opacity: 0; transform: translateY(16px);
+    }
+    .cane-stat { display: flex; flex-direction: column; gap: 0.4rem; }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      line-height: 1; color: var(--gold); letter-spacing: 0.02em;
+    }
+    .stat-label {
+      font-size: 0.55rem; letter-spacing: 0.45em;
+      text-transform: uppercase; color: var(--cream); opacity: 0.4;
+    }
+
+    /* ─── TRAVERSE ──────────────────────────────────────── */
+    #traverse { padding: 10rem 0; }
+    .traverse-inner {
+      display: flex; flex-direction: column;
+      align-items: flex-end; text-align: right;
+    }
+    .traverse-label {
       font-size: 0.65rem; letter-spacing: 0.55em;
       text-transform: uppercase; color: var(--gold);
-      margin-bottom: 1.5rem; opacity: 0; transform: translateY(18px);
+      margin-bottom: 2.5rem; opacity: 0; transform: translateY(16px);
     }
-    .ar-title {
+    .traverse-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.6rem, 3.2vw, 2.8rem);
+      font-style: italic; line-height: 1.55;
+      color: var(--cream); max-width: 720px;
+      opacity: 0; transform: translateY(30px);
+    }
+    .traverse-quote em {
+      color: var(--gold); font-style: normal;
+    }
+    .traverse-rule {
+      width: 0; height: 1px; background: var(--gold);
+      opacity: 0; margin: 2.5rem 0 2rem auto;
+    }
+    .traverse-meta {
+      display: flex; gap: 3rem;
+      opacity: 0; transform: translateY(16px);
+    }
+    .traverse-meta-item {
+      font-size: 0.6rem; letter-spacing: 0.4em;
+      text-transform: uppercase; color: var(--dim);
+    }
+
+    /* ─── PROCESS ───────────────────────────────────────── */
+    #process { padding: 8rem 0; }
+    .process-title {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(3rem, 10vw, 9rem);
-      line-height: 0.85; color: var(--cream);
-      opacity: 0; transform: translateY(40px); margin-bottom: 2rem;
+      font-size: clamp(3rem, 8vw, 7rem);
+      line-height: 0.9; color: var(--cream);
+      margin-bottom: 5rem; opacity: 0; transform: translateY(30px);
     }
-    .ar-body {
-      font-size: clamp(0.9rem, 1.4vw, 1.1rem);
-      font-style: italic; line-height: 2; color: var(--dim);
-      max-width: 480px; margin: 0 auto 3rem;
-      opacity: 0; transform: translateY(18px);
+    .process-steps {
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      gap: 2rem; position: relative;
     }
-    .ar-cta {
-      display: inline-block; padding: 1.1rem 4rem;
-      border: 1px solid rgba(201,168,76,0.5);
-      font-size: 0.65rem; letter-spacing: 0.5em;
-      text-transform: uppercase; color: var(--gold);
-      text-decoration: none;
-      transition: background 0.3s, color 0.3s;
-      opacity: 0; transform: translateY(18px);
+    .process-steps::before {
+      content: ''; position: absolute;
+      top: 0.6rem; left: 0; right: 0;
+      height: 1px; background: rgba(201,168,76,0.15);
     }
-    .ar-cta:hover { background: var(--gold); color: var(--navy); }
+    .process-step {
+      position: relative; padding-top: 3rem;
+      opacity: 0; transform: translateY(20px);
+    }
+    .step-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.85rem; letter-spacing: 0.25em;
+      color: var(--gold); margin-bottom: 1.2rem;
+      display: flex; align-items: center; gap: 0.7rem;
+    }
+    .step-num::before {
+      content: ''; display: block;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--gold); flex-shrink: 0;
+      position: absolute; top: -0.35rem; left: 0;
+    }
+    .step-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.2rem, 2vw, 1.8rem);
+      letter-spacing: 0.04em; line-height: 1;
+      color: var(--cream); margin-bottom: 0.8rem;
+    }
+    .step-desc {
+      font-size: 0.78rem; font-style: italic;
+      line-height: 1.9; color: var(--dim);
+    }
+
+    /* ─── BOTTLE FADE ───────────────────────────────────── */
+    #bottle-fade {
+      position: fixed; inset: 0; z-index: 1;
+      pointer-events: none; opacity: 0;
+      background: var(--navy);
+    }
+
+    /* ─── HERITAGE YEAR GLOW ─────────────────────────────── */
+    @keyframes yearGlow {
+      0%, 100% { -webkit-text-stroke-color: rgba(201,168,76,0.28); filter: none; }
+      50%       { -webkit-text-stroke-color: rgba(201,168,76,0.65); filter: drop-shadow(0 0 50px rgba(201,168,76,0.2)); }
+    }
+    .heritage-year.glow { animation: yearGlow 2.8s ease-in-out infinite; }
+
+    /* ─── GLASS ENTRY ─────────────────────────────────── */
+    #glass-entry {
+      position: fixed; inset: 0; z-index: 4;
+      pointer-events: none; opacity: 0;
+      background: radial-gradient(ellipse 65% 55% at 50% 50%,
+        transparent 25%, rgba(4, 10, 22, 0.95) 100%);
+    }
+    #glass-flash {
+      position: fixed; inset: 0; z-index: 5;
+      pointer-events: none; opacity: 0;
+      background: radial-gradient(ellipse 55% 45% at 50% 50%,
+        rgba(215, 170, 55, 0.85) 0%, transparent 65%);
+    }
 
     /* ─── ECLIPSE FINAL ───────────────────────────────── */
     #eclipse-final { padding: 10rem 0; text-align: center; }
@@ -499,6 +618,16 @@
   <canvas id="three-canvas"></canvas>
 </div>
 
+<!-- Barbados photo overlay -->
+<div id="barbados-overlay" aria-hidden="true"></div>
+
+<!-- Bottle fade (eclipse final) -->
+<div id="bottle-fade" aria-hidden="true"></div>
+
+<!-- Glass entry effects -->
+<div id="glass-entry" aria-hidden="true"></div>
+<div id="glass-flash" aria-hidden="true"></div>
+
 <!-- Grain -->
 <div class="grain"></div>
 
@@ -510,9 +639,8 @@
     <li><a href="#origins">Origines</a></li>
     <li><a href="#heritage">Héritage</a></li>
     <li><a href="#cocktails">Cocktails</a></li>
-    <li><a href="#ar-section">Expérience AR</a></li>
   </ul>
-  <a href="#ar-section" class="nav-cta">Découvrir</a>
+  <a href="#eclipse-final" class="nav-cta">Découvrir</a>
 </nav>
 
 <!-- HERO -->
@@ -530,6 +658,32 @@
     <p>The World's Oldest Rum Distillery</p>
   </div>
   <div class="scroll-indicator"><span>Scroll</span></div>
+  <div class="section-hr"></div>
+</section>
+
+<!-- CANE -->
+<section class="section" id="cane">
+  <div class="section-inner">
+    <div class="eyebrow" id="cane-eyebrow">Saccharum Officinarum · Barbade</div>
+    <h2 class="cane-title" id="cane-title">La Canne<br>à Sucre</h2>
+    <div class="cane-body" id="cane-body">
+      <p>Tout commence ici. Dans les champs coralliens de la Barbade, sous un soleil implacable, la canne à sucre pousse depuis des siècles. Sa mélasse — unique au monde — est l'âme d'un rhum sans égal.</p>
+    </div>
+    <div class="cane-stats" id="cane-stats">
+      <div class="cane-stat">
+        <span class="stat-num">320+</span>
+        <span class="stat-label">Années de culture</span>
+      </div>
+      <div class="cane-stat">
+        <span class="stat-num">100%</span>
+        <span class="stat-label">Mélasse de canne</span>
+      </div>
+      <div class="cane-stat">
+        <span class="stat-num">2</span>
+        <span class="stat-label">Alambics distincts</span>
+      </div>
+    </div>
+  </div>
   <div class="section-hr"></div>
 </section>
 
@@ -578,12 +732,67 @@
   <div class="section-hr"></div>
 </section>
 
+<!-- TRAVERSE -->
+<section class="section" id="traverse">
+  <div class="section-inner">
+    <div class="traverse-inner">
+      <div class="traverse-label" id="traverse-label">Depuis les Caraïbes · Vers le Monde</div>
+      <blockquote class="traverse-quote" id="traverse-quote">
+        "Ce rhum a traversé <em>les océans</em> avant même<br>que les nations n'aient tracé leurs frontières."
+      </blockquote>
+      <div class="traverse-rule" id="traverse-rule"></div>
+      <div class="traverse-meta" id="traverse-meta">
+        <span class="traverse-meta-item">Barbade · Caraïbes</span>
+        <span class="traverse-meta-item">1703 — Présent</span>
+        <span class="traverse-meta-item">Rhum de la Couronne</span>
+      </div>
+    </div>
+  </div>
+  <div class="section-hr"></div>
+</section>
+
 <!-- HERITAGE -->
 <section class="section" id="heritage">
   <div class="section-inner" style="text-align:right">
     <div class="eyebrow" id="heritage-eyebrow" style="text-align:right">Unbroken Since</div>
     <h2 class="heritage-year" id="heritage-year">1703</h2>
     <p class="heritage-body" id="heritage-body">Des sols de calcaire corallien de la Barbade, un héritage distillé à travers les siècles. Mount Gay, la plus ancienne distillerie de rhum au monde encore en activité.</p>
+  </div>
+  <div class="section-hr"></div>
+</section>
+
+<!-- PROCESS -->
+<section class="section" id="process">
+  <div class="section-inner" style="padding-top:6rem;padding-bottom:6rem">
+    <div class="eyebrow" id="process-eyebrow">De la Terre au Verre</div>
+    <h2 class="process-title" id="process-title">Le Processus</h2>
+    <div class="process-steps">
+      <div class="process-step" id="process-1">
+        <div class="step-num">01</div>
+        <div class="step-name">Récolte</div>
+        <p class="step-desc">La canne est récoltée à la main, en saison sèche, au pic de sa concentration en sucres naturels.</p>
+      </div>
+      <div class="process-step" id="process-2">
+        <div class="step-num">02</div>
+        <div class="step-name">Fermentation</div>
+        <p class="step-desc">La mélasse fermente 36 à 48 heures avec des levures sélectionnées, développant ses arômes tropicaux.</p>
+      </div>
+      <div class="process-step" id="process-3">
+        <div class="step-num">03</div>
+        <div class="step-name">Distillation</div>
+        <p class="step-desc">Deux alambics distincts — colonne et pot still — produisent deux eaux-de-vie au caractère complémentaire.</p>
+      </div>
+      <div class="process-step" id="process-4">
+        <div class="step-num">04</div>
+        <div class="step-name">Vieillissement</div>
+        <p class="step-desc">En fûts de chêne américain, sous le soleil des Caraïbes. Le climat tropical accélère le dialogue bois-alcool.</p>
+      </div>
+      <div class="process-step" id="process-5">
+        <div class="step-num">05</div>
+        <div class="step-name">Assemblage</div>
+        <p class="step-desc">Le Maître de Chai compose l'Eclipse — équilibre parfait entre fraîcheur tropicale et profondeur boisée.</p>
+      </div>
+    </div>
   </div>
   <div class="section-hr"></div>
 </section>
@@ -630,17 +839,6 @@
         </ul>
       </div>
     </div>
-  </div>
-  <div class="section-hr"></div>
-</section>
-
-<!-- AR EXPERIENCE -->
-<section class="section" id="ar-section" style="justify-content:center">
-  <div style="text-align:center;width:100%;padding:0 3rem">
-    <div class="ar-eyebrow" id="ar-eyebrow">Technologie · WebAR</div>
-    <h2 class="ar-title" id="ar-title">Expérience<br>Augmentée</h2>
-    <p class="ar-body" id="ar-body">Pointez votre smartphone sur la bouteille. La carte au trésor de la Barbade se déploie en réalité augmentée — sans application, directement depuis votre navigateur.</p>
-    <a href="experience.html" class="ar-cta" id="ar-cta">Lancer l'expérience AR</a>
   </div>
   <div class="section-hr"></div>
 </section>
@@ -769,23 +967,31 @@ const bgMat = new THREE.ShaderMaterial({
     uniform float uProgress;
     uniform float uTime;
     uniform vec2  uRes;
-    vec3 c0 = vec3(0.024, 0.043, 0.078);
-    vec3 c1 = vec3(0.018, 0.032, 0.065);
-    vec3 c2 = vec3(0.028, 0.050, 0.090);
-    vec3 g0 = vec3(0.200, 0.130, 0.030);
-    vec3 g1 = vec3(0.120, 0.090, 0.020);
-    vec3 g2 = vec3(0.260, 0.160, 0.035);
+    // 0 hero/cane  1 product/origins  2 traverse/heritage  3 process/cocktails  4 eclipse
+    vec3 bg0 = vec3(0.024, 0.043, 0.078);
+    vec3 bg1 = vec3(0.016, 0.028, 0.058);
+    vec3 bg2 = vec3(0.008, 0.014, 0.048);
+    vec3 bg3 = vec3(0.026, 0.015, 0.007);
+    vec3 bg4 = vec3(0.004, 0.004, 0.009);
+    vec3 g0  = vec3(0.200, 0.130, 0.030);
+    vec3 g1  = vec3(0.110, 0.085, 0.018);
+    vec3 g2  = vec3(0.038, 0.058, 0.130);
+    vec3 g3  = vec3(0.290, 0.160, 0.025);
+    vec3 g4  = vec3(0.240, 0.155, 0.042);
+    vec3 lerpV(vec3 a, vec3 b, float t) { return a + (b - a) * clamp(t, 0.0, 1.0); }
     void main() {
       vec2 uv = gl_FragCoord.xy / uRes;
       vec2 p  = uv - vec2(0.5, 0.38);
       float d = length(p);
       float breathe = sin(uTime * 0.35) * 0.035 + 1.0;
-      float prog = clamp(uProgress, 0.0, 1.0);
-      float prog2 = clamp(uProgress - 1.0, 0.0, 1.0);
-      vec3 bg   = mix(mix(c0, c1, prog), c2, prog2);
-      vec3 glow = mix(mix(g0, g1, prog), g2, prog2);
+      float pr = clamp(uProgress, 0.0, 4.0);
+      vec3 bg, gl_col;
+      if (pr < 1.0)      { bg = lerpV(bg0,bg1,pr);       gl_col = lerpV(g0,g1,pr); }
+      else if (pr < 2.0) { bg = lerpV(bg1,bg2,pr-1.0);   gl_col = lerpV(g1,g2,pr-1.0); }
+      else if (pr < 3.0) { bg = lerpV(bg2,bg3,pr-2.0);   gl_col = lerpV(g2,g3,pr-2.0); }
+      else               { bg = lerpV(bg3,bg4,pr-3.0);   gl_col = lerpV(g3,g4,pr-3.0); }
       float halo = (1.0 - smoothstep(0.0, 0.90 * breathe, d)) * 0.45;
-      vec3 col = bg + glow * halo;
+      vec3 col = bg + gl_col * halo;
       col *= 1.0 - smoothstep(0.45, 1.2, length(uv - 0.5));
       gl_FragColor = vec4(col, 1.0);
     }
@@ -801,11 +1007,32 @@ const fill = new THREE.DirectionalLight(0x2040a0, 0.8);
 fill.position.set(-3, 0, 1); scene.add(fill);
 const rim = new THREE.DirectionalLight(0xffb020, 2.2);
 rim.position.set(0.5, -3, -2); scene.add(rim);
+const keyBase = key.intensity; // valeur nominale — restaurée à la sortie des sections
+let caneLight           = null; // lumière ambrée chaude — section canne à sucre
+let traverseHouleTarget = 0; // houle Y dynamique — section traverse
+let cocktailsYTarget    = 0; // drift Y vers le haut — section cocktails (bouteille levée)
+let finalRotExtra       = 0; // rotation 360° additive — section finale / footer
+let studioKeyLight  = null; // lumière blanche directionnelle — section product
+let studioFillLight = null; // fill bleu-gris — section product
+let rimProductLight = null; // rim light dorée — section product
+let reflectPlane    = null; // plan de reflet sol — section product
+let productSnapRotY  = null; // snap rotation 3/4 face — section product
+let bottleBaseScale  = 1;    // scale normalisé de la bouteille (calculé au chargement)
 
 // Bottle
 let bottle = null;
+let barbadosDisc = null;
 const clock = new THREE.Clock();
 const scrollState = { rotY: 0, posY: 0 };
+const originsState = { active: false, camX: 0, camY: 0, camZ: 5, lookTargetY: 0, discOpacity: 0, insideGlass: 0, glassFlash: 0 };
+const overlayEl    = document.getElementById('barbados-overlay');
+const glassEntryEl = document.getElementById('glass-entry');
+const glassFlashEl = document.getElementById('glass-flash');
+let interiorLight  = null;
+let glassRing      = null;
+let currentLookY   = 0;
+const sectionState  = { targetX: 0, targetTiltZ: 0, currentX: 0, currentTiltZ: 0, bottleOpacity: 1 };
+const bottleFadeEl  = document.getElementById('bottle-fade');
 
 const OBJ_BASE = 'assets/Meshy_AI_Whiskey_Bottle_0312102948_texture_obj/';
 const OBJ_NAME = 'Meshy_AI_Whiskey_Bottle_0312102948_texture';
@@ -823,11 +1050,94 @@ mtlLoader.load(OBJ_NAME + '.mtl', (materials) => {
     const size = box.getSize(new THREE.Vector3());
     const ctr  = box.getCenter(new THREE.Vector3());
     const sc   = 2.8 / Math.max(size.x, size.y, size.z);
+    bottleBaseScale = sc; // stocker pour les animations de scale (heritage, etc.)
     bottle.scale.setScalar(sc);
     bottle.position.copy(ctr.multiplyScalar(-sc));
     scene.add(bottle);
+    // Vue depuis l'intérieur : double-sided pour voir les parois en verre
+    bottle.traverse(c => {
+      if (c.isMesh) {
+        const mats = Array.isArray(c.material) ? c.material : [c.material];
+        mats.forEach(m => { m.side = THREE.DoubleSide; });
+      }
+    });
+    // Lumière ambrée intérieure
+    interiorLight = new THREE.PointLight(0xc9a84c, 0, 3.5);
+    interiorLight.position.set(0, -0.3, 0);
+    scene.add(interiorLight);
+    // Anneau de réfraction au col de la bouteille
+    glassRing = new THREE.Mesh(
+      new THREE.TorusGeometry(0.18, 0.009, 8, 64),
+      new THREE.MeshBasicMaterial({ color: 0xe0c060, transparent: true, opacity: 0, depthWrite: false })
+    );
+    glassRing.position.y = 1.18;
+    scene.add(glassRing);
+    // Lumières studio packshot (section product)
+    studioKeyLight = new THREE.DirectionalLight(0xffffff, 0);
+    studioKeyLight.position.set(5, 3, 5); scene.add(studioKeyLight);
+    studioFillLight = new THREE.PointLight(0xdde4f0, 0, 20);
+    studioFillLight.position.set(-4, 1, 3); scene.add(studioFillLight);
+    rimProductLight = new THREE.PointLight(0xc9a84c, 0, 15);
+    rimProductLight.position.set(-3, 4, -2); scene.add(rimProductLight);
+    // Plan de reflet sol (section product) — gradient alpha canvas
+    const reflCanvas = document.createElement('canvas');
+    reflCanvas.width = 1; reflCanvas.height = 64;
+    const rCtx = reflCanvas.getContext('2d');
+    const rGrad = rCtx.createLinearGradient(0, 0, 0, 64);
+    rGrad.addColorStop(0, 'rgba(255,255,255,0)');
+    rGrad.addColorStop(1, 'rgba(255,255,255,1)');
+    rCtx.fillStyle = rGrad; rCtx.fillRect(0, 0, 1, 64);
+    const reflMat  = new THREE.MeshBasicMaterial({ color: 0x8899aa, transparent: true, opacity: 0, alphaMap: new THREE.CanvasTexture(reflCanvas), depthWrite: false });
+    reflectPlane = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 2.0), reflMat);
+    reflectPlane.rotation.x = -Math.PI / 2;
+    reflectPlane.position.y = -1.4;
+    scene.add(reflectPlane);
+
     bottle.scale.setScalar(0);
     gsap.to(bottle.scale, { x: sc, y: sc, z: sc, duration: 2.0, ease: 'back.out(1.1)', delay: 0.4 });
+
+    // ─── Barbados disc (inside bottle base) ──────────────
+    const bCanvas = document.createElement('canvas');
+    bCanvas.width = 512; bCanvas.height = 512;
+    const bCtx = bCanvas.getContext('2d');
+    // Ocean
+    const oceanGrad = bCtx.createRadialGradient(256, 256, 0, 256, 256, 256);
+    oceanGrad.addColorStop(0, '#0e6a8a'); oceanGrad.addColorStop(1, '#041c38');
+    bCtx.fillStyle = oceanGrad; bCtx.fillRect(0, 0, 512, 512);
+    // Reef ring
+    bCtx.beginPath(); bCtx.arc(256, 256, 200, 0, Math.PI * 2);
+    bCtx.strokeStyle = 'rgba(180,140,80,0.25)'; bCtx.lineWidth = 12; bCtx.stroke();
+    // Island (Barbados: tall teardrop, slightly tilted)
+    bCtx.save(); bCtx.translate(256, 248); bCtx.rotate(-0.18);
+    const islandGrad = bCtx.createRadialGradient(-10, -30, 0, 0, 0, 130);
+    islandGrad.addColorStop(0, '#4aab62'); islandGrad.addColorStop(0.6, '#2d7a44'); islandGrad.addColorStop(1, '#1a5530');
+    bCtx.beginPath();
+    bCtx.moveTo(0, -130);
+    bCtx.bezierCurveTo(60, -90, 90, 10, 70, 90);
+    bCtx.bezierCurveTo(50, 140, -50, 140, -70, 90);
+    bCtx.bezierCurveTo(-90, 10, -60, -90, 0, -130);
+    bCtx.fillStyle = islandGrad; bCtx.fill();
+    // Highlands highlight
+    bCtx.beginPath(); bCtx.ellipse(-8, -40, 38, 55, 0.15, 0, Math.PI * 2);
+    bCtx.fillStyle = 'rgba(90,185,110,0.4)'; bCtx.fill();
+    bCtx.restore();
+    // Bridgetown dot
+    bCtx.beginPath(); bCtx.arc(222, 300, 7, 0, Math.PI * 2);
+    bCtx.fillStyle = '#c9a84c'; bCtx.fill();
+    bCtx.beginPath(); bCtx.arc(222, 300, 12, 0, Math.PI * 2);
+    bCtx.strokeStyle = 'rgba(201,168,76,0.5)'; bCtx.lineWidth = 2; bCtx.stroke();
+    // Coordinates
+    bCtx.fillStyle = 'rgba(201,168,76,0.9)';
+    bCtx.font = 'bold 22px monospace'; bCtx.textAlign = 'center';
+    bCtx.fillText("13°10'N  59°32'W", 256, 460);
+    const barbadosTex = new THREE.CanvasTexture(bCanvas);
+    barbadosDisc = new THREE.Mesh(
+      new THREE.CircleGeometry(0.33, 64),
+      new THREE.MeshBasicMaterial({ map: barbadosTex, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false })
+    );
+    // Place at bottle base (bottle is ~2.8 units tall, centered, so base ≈ y = -1.4 * sc but we work in world space)
+    barbadosDisc.position.set(0, -1.38, 0.01);
+    scene.add(barbadosDisc);
 
     ScrollTrigger.create({
       trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 2.5,
@@ -840,14 +1150,73 @@ mtlLoader.load(OBJ_NAME + '.mtl', (materials) => {
   }, (xhr) => { if (xhr.total) updateLoader(xhr.loaded / xhr.total); });
 });
 
-// Background progress
+// ─── Progression chromatique globale (0→4 sur toute la page) ──
 ScrollTrigger.create({
-  trigger: '#origins', start: 'top bottom', end: 'top top', scrub: 2,
-  onUpdate: s => { bgMat.uniforms.uProgress.value = s.progress; }
+  trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 2,
+  onUpdate: s => { bgMat.uniforms.uProgress.value = s.progress * 4.0; }
 });
+
+// ─── Origins: plongée dans la bouteille ───────────────
 ScrollTrigger.create({
-  trigger: '#heritage', start: 'top bottom', end: 'top top', scrub: 2,
-  onUpdate: s => { bgMat.uniforms.uProgress.value = 1 + s.progress; }
+  trigger: '#origins',
+  start: 'top top',
+  end: '+=320%',
+  pin: true,
+  scrub: 1.0,
+  onEnter: () => { originsState.active = true; },
+  onUpdate: (s) => {
+    const p = s.progress;
+    // Easing smoothstep
+    function ss(t) { const c = Math.max(0, Math.min(1, t)); return c * c * (3 - 2 * c); }
+    function cl(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+    let cy, cz, ly;
+
+    if (p < 0.35) {
+      // Phase 1 : la caméra s'élève et avance — on voit le dessus de la bouteille
+      const t = ss(p / 0.35);
+      cy = t * 2.4;
+      cz = 5 - t * 4.2;   // 5 → 0.8
+      ly = t * 1.0;        // regard vers le goulot
+    } else if (p < 0.55) {
+      // Phase 2 : plongée dans le col — traversée du verre
+      const t = ss((p - 0.35) / 0.20);
+      cy = 2.4 - t * 1.0;  // 2.4 → 1.4
+      cz = 0.8 - t * 0.75; // 0.8 → 0.05
+      ly = 1.0 - t * 1.8;  // 1.0 → −0.8
+    } else {
+      // Phase 3 : à l'intérieur — descente vers la Barbade
+      const t = ss((p - 0.55) / 0.45);
+      cy = 1.4 - t * 1.8;  // 1.4 → −0.4
+      cz = 0.05;
+      ly = -0.8 - t * 0.5; // −0.8 → −1.3
+    }
+
+    originsState.camX = 0;
+    originsState.camY = cy;
+    originsState.camZ = cz;
+    originsState.lookTargetY = ly;
+
+    // Flash de réfraction — pic à p=0.48 (traversée du verre)
+    const gd = Math.abs(p - 0.48);
+    originsState.glassFlash = Math.max(0, 1 - gd / 0.06);
+
+    // Atmosphère intérieure — s'installe dès qu'on est passé
+    originsState.insideGlass = cl((p - 0.52) / 0.15, 0, 1);
+
+    // Carte de la Barbade — visible une fois bien à l'intérieur
+    originsState.discOpacity = cl((p - 0.64) / 0.22, 0, 1);
+  },
+  onLeave: () => {
+    originsState.active = false;
+    originsState.insideGlass = 0; originsState.glassFlash = 0;
+  },
+  onLeaveBack: () => {
+    originsState.active = false;
+    originsState.camX = 0; originsState.camY = 0; originsState.camZ = 5;
+    originsState.lookTargetY = 0; originsState.discOpacity = 0;
+    originsState.insideGlass = 0; originsState.glassFlash = 0;
+  }
 });
 
 // ─── LOADER ───────────────────────────────────────────
@@ -874,12 +1243,143 @@ function reveal(ids, trigger, stagger = 0.12) {
   const tl = gsap.timeline({ scrollTrigger: { trigger, start: 'top 70%', end: 'top 25%', scrub: 1 } });
   ids.forEach((id, i) => tl.to('#' + id, { opacity: 1, y: 0, duration: 1 }, i * stagger));
 }
+reveal(['cane-eyebrow', 'cane-title', 'cane-body', 'cane-stats'], '#cane');
 reveal(['product-eyebrow', 'product-title', 'product-body'], '#product');
 reveal(['origins-eyebrow', 'origins-title', 'origins-coords', 'origins-body'], '#origins');
+reveal(['traverse-label', 'traverse-quote', 'traverse-meta'], '#traverse');
 reveal(['heritage-eyebrow', 'heritage-year', 'heritage-body'], '#heritage');
+reveal(['process-eyebrow', 'process-title', 'process-1', 'process-2', 'process-3', 'process-4', 'process-5'], '#process', 0.08);
 reveal(['cocktails-eyebrow', 'cocktails-title', 'cocktails-link', 'cocktail-1', 'cocktail-2', 'cocktail-3'], '#cocktails');
-reveal(['ar-eyebrow', 'ar-title', 'ar-body', 'ar-cta'], '#ar-section');
 reveal(['ef-eyebrow', 'ef-title', 'ef-sub'], '#eclipse-final');
+
+// Ligne traverse — se dessine au scroll
+gsap.timeline({ scrollTrigger: { trigger: '#traverse', start: 'top 65%', end: 'top 30%', scrub: 1 } })
+  .to('#traverse-rule', { width: '340px', opacity: 0.35, duration: 1 });
+
+// ─── POSITION BOUTEILLE PAR SECTION ───────────────────
+[
+  { id: '#cane',      x:  0.55, tz:  0.00 },
+  { id: '#product',   x: -1.20, tz:  0.00 },
+  { id: '#traverse',  x: -0.42, tz:  0.000 }, // tilt géré dynamiquement par ScrollTrigger dédié
+  { id: '#heritage',  x:  0.80, tz:  0.00 }, // recule à droite pour libérer le "1703"
+  { id: '#process',   x:  0.48, tz: -0.03 },
+  { id: '#cocktails', x:  0.00, tz: -0.26 }, // 15° tilt — bouteille tenue pour servir
+].forEach(({ id, x, tz }) => {
+  ScrollTrigger.create({
+    trigger: id, start: 'top 60%', end: 'bottom 40%',
+    onEnter:     () => { sectionState.targetX = x;  sectionState.targetTiltZ = tz; },
+    onEnterBack: () => { sectionState.targetX = x;  sectionState.targetTiltZ = tz; },
+    onLeave:     () => { sectionState.targetX = 0;  sectionState.targetTiltZ = 0;  },
+    onLeaveBack: () => { sectionState.targetX = 0;  sectionState.targetTiltZ = 0;  },
+  });
+});
+
+// Product — studio packshot : lumières + snap rotation 3/4 face + reflet sol
+ScrollTrigger.create({
+  trigger: '#product', start: 'top 60%', end: 'bottom 40%',
+  onEnter: () => {
+    if (!studioKeyLight) return;
+    gsap.to(studioKeyLight, { intensity: 4.0, duration: 0.6, overwrite: true });
+    gsap.to(studioFillLight, { intensity: 1.0, duration: 0.6, overwrite: true });
+    gsap.to(rimProductLight, { intensity: 3.0, duration: 0.4, overwrite: true });
+    if (reflectPlane) gsap.to(reflectPlane.material, { opacity: 0.3, duration: 0.5 });
+    productSnapRotY = -0.4;
+  },
+  onEnterBack: () => {
+    if (!studioKeyLight) return;
+    gsap.to(studioKeyLight, { intensity: 4.0, duration: 0.6, overwrite: true });
+    gsap.to(studioFillLight, { intensity: 1.0, duration: 0.6, overwrite: true });
+    gsap.to(rimProductLight, { intensity: 3.0, duration: 0.4, overwrite: true });
+    if (reflectPlane) gsap.to(reflectPlane.material, { opacity: 0.3, duration: 0.5 });
+    productSnapRotY = -0.4;
+  },
+  onLeave: () => {
+    if (!studioKeyLight) return;
+    gsap.to(studioKeyLight, { intensity: 0, duration: 0.4, overwrite: true });
+    gsap.to(studioFillLight, { intensity: 0, duration: 0.4, overwrite: true });
+    gsap.to(rimProductLight, { intensity: 0, duration: 0.3, overwrite: true });
+    if (reflectPlane) gsap.to(reflectPlane.material, { opacity: 0, duration: 0.3 });
+    productSnapRotY = null;
+  },
+  onLeaveBack: () => {
+    if (!studioKeyLight) return;
+    gsap.to(studioKeyLight, { intensity: 0, duration: 0.4, overwrite: true });
+    gsap.to(studioFillLight, { intensity: 0, duration: 0.4, overwrite: true });
+    gsap.to(rimProductLight, { intensity: 0, duration: 0.3, overwrite: true });
+    if (reflectPlane) gsap.to(reflectPlane.material, { opacity: 0, duration: 0.3 });
+    productSnapRotY = null;
+  },
+});
+
+// Cane — lumière ambrée chaude (champs de canne, soleil caribéen)
+caneLight = new THREE.PointLight(0xf5a623, 0, 12);
+caneLight.position.set(3, 3, 2);
+scene.add(caneLight);
+ScrollTrigger.create({
+  trigger: '#cane', start: 'top 60%', end: 'bottom 40%',
+  onEnter:     () => { gsap.to(caneLight, { intensity: 2.5, duration: 0.6, overwrite: true }); gsap.to(key, { intensity: keyBase * 0.7, duration: 0.4, overwrite: true }); },
+  onEnterBack: () => { gsap.to(caneLight, { intensity: 2.5, duration: 0.6, overwrite: true }); gsap.to(key, { intensity: keyBase * 0.7, duration: 0.4, overwrite: true }); },
+  onLeave:     () => { gsap.to(caneLight, { intensity: 0, duration: 0.4, overwrite: true }); gsap.to(key, { intensity: keyBase, duration: 0.3, overwrite: true }); },
+  onLeaveBack: () => { gsap.to(caneLight, { intensity: 0, duration: 0.4, overwrite: true }); gsap.to(key, { intensity: keyBase, duration: 0.3, overwrite: true }); },
+});
+
+// Cocktails — drift Y vers le haut (bouteille levée pour servir)
+ScrollTrigger.create({
+  trigger: '#cocktails', start: 'top 60%', end: 'bottom 40%',
+  onEnter:     () => { cocktailsYTarget = 0.3; },
+  onEnterBack: () => { cocktailsYTarget = 0.3; },
+  onLeave:     () => { cocktailsYTarget = 0; },
+  onLeaveBack: () => { cocktailsYTarget = 0; },
+});
+
+// Traverse — roulis sinusoïdal (balancement navire)
+ScrollTrigger.create({
+  trigger: '#traverse', start: 'top 60%', end: 'bottom 40%', scrub: 1.0,
+  onUpdate: (s) => {
+    sectionState.targetTiltZ = Math.sin(s.progress * Math.PI * 2) * 0.18;
+    traverseHouleTarget      = Math.cos(s.progress * Math.PI) * 0.10;
+  },
+  onLeave:     () => { sectionState.targetTiltZ = 0; traverseHouleTarget = 0; },
+  onLeaveBack: () => { sectionState.targetTiltZ = 0; traverseHouleTarget = 0; },
+});
+
+// Heritage — recul bouteille (scale 60% pour libérer l'espace du "1703")
+ScrollTrigger.create({
+  trigger: '#heritage', start: 'top 60%', end: 'bottom 40%',
+  onEnter:     () => { if (bottle) gsap.to(bottle.scale, { x: bottleBaseScale * 0.6, y: bottleBaseScale * 0.6, z: bottleBaseScale * 0.6, duration: 0.7, ease: 'power2.out', overwrite: true }); },
+  onEnterBack: () => { if (bottle) gsap.to(bottle.scale, { x: bottleBaseScale * 0.6, y: bottleBaseScale * 0.6, z: bottleBaseScale * 0.6, duration: 0.7, ease: 'power2.out', overwrite: true }); },
+  onLeave:     () => { if (bottle) gsap.to(bottle.scale, { x: bottleBaseScale,       y: bottleBaseScale,       z: bottleBaseScale,       duration: 0.5, ease: 'power2.out', overwrite: true }); },
+  onLeaveBack: () => { if (bottle) gsap.to(bottle.scale, { x: bottleBaseScale,       y: bottleBaseScale,       z: bottleBaseScale,       duration: 0.5, ease: 'power2.out', overwrite: true }); },
+});
+
+// Heritage — shimmer sur le "1703" quand la section est active
+ScrollTrigger.create({
+  trigger: '#heritage', start: 'top 60%', end: 'bottom 40%',
+  onEnter:     () => document.getElementById('heritage-year').classList.add('glow'),
+  onLeave:     () => document.getElementById('heritage-year').classList.remove('glow'),
+  onEnterBack: () => document.getElementById('heritage-year').classList.add('glow'),
+  onLeaveBack: () => document.getElementById('heritage-year').classList.remove('glow'),
+});
+
+// Final — rotation 360° complète dans le footer (dernier salut de la bouteille)
+ScrollTrigger.create({
+  trigger: 'footer', start: 'top 80%', end: 'bottom 20%', scrub: 1.0,
+  onUpdate: (s) => { finalRotExtra = s.progress * Math.PI * 2; },
+  onLeaveBack: () => { finalRotExtra = 0; },
+});
+
+// Eclipse Final — la bouteille s'efface, laissant place au titre
+ScrollTrigger.create({
+  trigger: '#eclipse-final', start: 'top 80%', end: 'top 15%', scrub: 1.5,
+  onUpdate: s => {
+    sectionState.bottleOpacity = 1 - s.progress;
+    if (bottleFadeEl) bottleFadeEl.style.opacity = s.progress * 0.96;
+  },
+  onLeaveBack: () => {
+    sectionState.bottleOpacity = 1;
+    if (bottleFadeEl) bottleFadeEl.style.opacity = 0;
+  }
+});
 
 // ─── RENDER LOOP ──────────────────────────────────────
 let elapsed = 0;
@@ -888,10 +1388,70 @@ let elapsed = 0;
   const dt = clock.getDelta();
   elapsed += dt;
   bgMat.uniforms.uTime.value = elapsed;
+
+  // Camera — monte au-dessus du goulot pendant origins
+  cam.position.x += (originsState.camX - cam.position.x) * 0.055;
+  cam.position.y += (originsState.camY - cam.position.y) * 0.055;
+  cam.position.z += (originsState.camZ - cam.position.z) * 0.055;
+  currentLookY += (originsState.lookTargetY - currentLookY) * 0.055;
+  cam.lookAt(0, currentLookY, 0);
+
   if (bottle) {
-    bottle.position.y = scrollState.posY + Math.sin(elapsed * 0.65) * 0.045;
-    bottle.rotation.y = scrollState.rotY + elapsed * 0.22;
+    // Houle traverse + drift cocktails — lerp fluide vers les cibles
+    sectionState.traverseHoule  = (sectionState.traverseHoule  || 0);
+    sectionState.traverseHoule += (traverseHouleTarget - sectionState.traverseHoule) * 0.05;
+    sectionState.cocktailsY     = (sectionState.cocktailsY     || 0);
+    sectionState.cocktailsY    += (cocktailsYTarget    - sectionState.cocktailsY)    * 0.05;
+    const floatY = scrollState.posY + Math.sin(elapsed * 0.65) * 0.045 + sectionState.traverseHoule + sectionState.cocktailsY;
+    // Décalage latéral et inclinaison par section (lerp fluide)
+    sectionState.currentX     += (sectionState.targetX     - sectionState.currentX)     * 0.038;
+    sectionState.currentTiltZ += (sectionState.targetTiltZ - sectionState.currentTiltZ) * 0.038;
+    bottle.position.x  = sectionState.currentX;
+    bottle.position.y  = floatY;
+    if (productSnapRotY !== null) {
+      bottle.rotation.y += (productSnapRotY - bottle.rotation.y) * 0.05;
+    } else {
+      bottle.rotation.y = scrollState.rotY + elapsed * 0.22 + finalRotExtra;
+    }
+    if (reflectPlane) reflectPlane.position.x = sectionState.currentX;
+    bottle.rotation.x += (0 - bottle.rotation.x) * 0.05;
+    bottle.rotation.z += (sectionState.currentTiltZ - bottle.rotation.z) * 0.06;
+    // Opacité bouteille (eclipse final)
+    bottle.traverse(c => {
+      if (c.isMesh) {
+        const mats = Array.isArray(c.material) ? c.material : [c.material];
+        mats.forEach(m => { m.transparent = true; m.opacity = sectionState.bottleOpacity; });
+      }
+    });
+
+    // Barbados disc au fond de la bouteille
+    if (barbadosDisc) {
+      barbadosDisc.position.x = 0;
+      barbadosDisc.position.y = floatY - 1.35;
+      barbadosDisc.position.z = 0;
+      barbadosDisc.rotation.x = -Math.PI / 2;
+      barbadosDisc.rotation.z = elapsed * 0.12;
+      barbadosDisc.scale.setScalar(1 + originsState.insideGlass * 1.8);
+      barbadosDisc.material.opacity = originsState.discOpacity;
+    }
+    // Lumière intérieure ambrée
+    if (interiorLight) {
+      interiorLight.intensity = originsState.insideGlass * 3.5;
+      interiorLight.position.set(0, floatY - 0.3, 0);
+    }
+    // Anneau de réfraction au col
+    if (glassRing) {
+      const gf = originsState.glassFlash;
+      glassRing.position.y = floatY + 1.18;
+      glassRing.scale.setScalar(1 + gf * 5);
+      glassRing.material.opacity = gf;
+    }
   }
+
+  // Glass overlays
+  if (glassEntryEl) glassEntryEl.style.opacity = originsState.insideGlass * 0.8;
+  if (glassFlashEl) glassFlashEl.style.opacity = originsState.glassFlash * 0.65;
+
   renderer.render(scene, cam);
 })();
 

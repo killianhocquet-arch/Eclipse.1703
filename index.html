@@ -298,6 +298,19 @@
       opacity: 0; transform: translateY(16px);
     }
 
+    /* ─── BARBADOS OVERLAY ────────────────────────────── */
+    #barbados-overlay {
+      position: fixed; inset: 0; z-index: 5;
+      pointer-events: none; opacity: 0;
+      background: url('assets/barbados.jpg') center/cover no-repeat;
+      transition: none;
+    }
+    #barbados-overlay::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(6,14,26,0.55) 0%, rgba(6,14,26,0) 40%, rgba(6,14,26,0) 60%, rgba(6,14,26,0.7) 100%);
+    }
+
     /* ─── HERITAGE ────────────────────────────────────── */
     #heritage { padding: 8rem 0; text-align: right; }
     .heritage-year {
@@ -498,6 +511,9 @@
 <div id="canvas-container">
   <canvas id="three-canvas"></canvas>
 </div>
+
+<!-- Barbados photo overlay (fades in during #origins scroll) -->
+<div id="barbados-overlay" aria-hidden="true"></div>
 
 <!-- Grain -->
 <div class="grain"></div>
@@ -804,8 +820,11 @@ rim.position.set(0.5, -3, -2); scene.add(rim);
 
 // Bottle
 let bottle = null;
+let barbadosDisc = null;
 const clock = new THREE.Clock();
 const scrollState = { rotY: 0, posY: 0 };
+const originsState = { active: false, camX: 0, camY: 0, camZ: 5, tiltX: 0, rotY: 0, rotYBase: 0, discOpacity: 0, overlayOpacity: 0 };
+const overlayEl = document.getElementById('barbados-overlay');
 
 const OBJ_BASE = 'assets/Meshy_AI_Whiskey_Bottle_0312102948_texture_obj/';
 const OBJ_NAME = 'Meshy_AI_Whiskey_Bottle_0312102948_texture';
@@ -829,6 +848,49 @@ mtlLoader.load(OBJ_NAME + '.mtl', (materials) => {
     bottle.scale.setScalar(0);
     gsap.to(bottle.scale, { x: sc, y: sc, z: sc, duration: 2.0, ease: 'back.out(1.1)', delay: 0.4 });
 
+    // ─── Barbados disc (inside bottle base) ──────────────
+    const bCanvas = document.createElement('canvas');
+    bCanvas.width = 512; bCanvas.height = 512;
+    const bCtx = bCanvas.getContext('2d');
+    // Ocean
+    const oceanGrad = bCtx.createRadialGradient(256, 256, 0, 256, 256, 256);
+    oceanGrad.addColorStop(0, '#0e6a8a'); oceanGrad.addColorStop(1, '#041c38');
+    bCtx.fillStyle = oceanGrad; bCtx.fillRect(0, 0, 512, 512);
+    // Reef ring
+    bCtx.beginPath(); bCtx.arc(256, 256, 200, 0, Math.PI * 2);
+    bCtx.strokeStyle = 'rgba(180,140,80,0.25)'; bCtx.lineWidth = 12; bCtx.stroke();
+    // Island (Barbados: tall teardrop, slightly tilted)
+    bCtx.save(); bCtx.translate(256, 248); bCtx.rotate(-0.18);
+    const islandGrad = bCtx.createRadialGradient(-10, -30, 0, 0, 0, 130);
+    islandGrad.addColorStop(0, '#4aab62'); islandGrad.addColorStop(0.6, '#2d7a44'); islandGrad.addColorStop(1, '#1a5530');
+    bCtx.beginPath();
+    bCtx.moveTo(0, -130);
+    bCtx.bezierCurveTo(60, -90, 90, 10, 70, 90);
+    bCtx.bezierCurveTo(50, 140, -50, 140, -70, 90);
+    bCtx.bezierCurveTo(-90, 10, -60, -90, 0, -130);
+    bCtx.fillStyle = islandGrad; bCtx.fill();
+    // Highlands highlight
+    bCtx.beginPath(); bCtx.ellipse(-8, -40, 38, 55, 0.15, 0, Math.PI * 2);
+    bCtx.fillStyle = 'rgba(90,185,110,0.4)'; bCtx.fill();
+    bCtx.restore();
+    // Bridgetown dot
+    bCtx.beginPath(); bCtx.arc(222, 300, 7, 0, Math.PI * 2);
+    bCtx.fillStyle = '#c9a84c'; bCtx.fill();
+    bCtx.beginPath(); bCtx.arc(222, 300, 12, 0, Math.PI * 2);
+    bCtx.strokeStyle = 'rgba(201,168,76,0.5)'; bCtx.lineWidth = 2; bCtx.stroke();
+    // Coordinates
+    bCtx.fillStyle = 'rgba(201,168,76,0.9)';
+    bCtx.font = 'bold 22px monospace'; bCtx.textAlign = 'center';
+    bCtx.fillText("13°10'N  59°32'W", 256, 460);
+    const barbadosTex = new THREE.CanvasTexture(bCanvas);
+    barbadosDisc = new THREE.Mesh(
+      new THREE.CircleGeometry(0.33, 64),
+      new THREE.MeshBasicMaterial({ map: barbadosTex, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false })
+    );
+    // Place at bottle base (bottle is ~2.8 units tall, centered, so base ≈ y = -1.4 * sc but we work in world space)
+    barbadosDisc.position.set(0, -1.38, 0.01);
+    scene.add(barbadosDisc);
+
     ScrollTrigger.create({
       trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 2.5,
       onUpdate: (s) => {
@@ -844,6 +906,33 @@ mtlLoader.load(OBJ_NAME + '.mtl', (materials) => {
 ScrollTrigger.create({
   trigger: '#origins', start: 'top bottom', end: 'top top', scrub: 2,
   onUpdate: s => { bgMat.uniforms.uProgress.value = s.progress; }
+});
+
+// ─── Origins: section pinée — rotation + zoom + Barbados ──
+ScrollTrigger.create({
+  trigger: '#origins',
+  start: 'top top',
+  end: '+=250%',
+  pin: true,
+  scrub: 1.2,
+  onEnter: () => { originsState.active = true; },
+  onUpdate: (s) => {
+    const p = s.progress;
+    // Caméra monte directement au-dessus → vue plongeante dans le goulot
+    originsState.camX = 0;
+    originsState.camY = p * 4.5;
+    originsState.camZ = 5 - p * 4.7;
+    // Disc Barbados fade in après 45%
+    originsState.discOpacity = THREE.MathUtils.clamp((p - 0.45) / 0.40, 0, 1);
+    // Photo réelle fade in après 78%
+    originsState.overlayOpacity = THREE.MathUtils.clamp((p - 0.78) / 0.22, 0, 1);
+  },
+  onLeave: () => { originsState.active = false; },
+  onLeaveBack: () => {
+    originsState.active = false;
+    originsState.camX = 0; originsState.camY = 0; originsState.camZ = 5;
+    originsState.discOpacity = 0; originsState.overlayOpacity = 0;
+  }
 });
 ScrollTrigger.create({
   trigger: '#heritage', start: 'top bottom', end: 'top top', scrub: 2,
@@ -888,10 +977,33 @@ let elapsed = 0;
   const dt = clock.getDelta();
   elapsed += dt;
   bgMat.uniforms.uTime.value = elapsed;
+
+  // Camera — monte au-dessus du goulot pendant origins
+  cam.position.x += (originsState.camX - cam.position.x) * 0.055;
+  cam.position.y += (originsState.camY - cam.position.y) * 0.055;
+  cam.position.z += (originsState.camZ - cam.position.z) * 0.055;
+  // lookAt fixe vers le centre de la scène — pas de flip possible
+  cam.lookAt(0, 0, 0);
+
   if (bottle) {
-    bottle.position.y = scrollState.posY + Math.sin(elapsed * 0.65) * 0.045;
+    const floatY = scrollState.posY + Math.sin(elapsed * 0.65) * 0.045;
+    bottle.position.y = floatY;
     bottle.rotation.y = scrollState.rotY + elapsed * 0.22;
+    bottle.rotation.x += (0 - bottle.rotation.x) * 0.05; // pas de tilt, bouteille droite
+
+    // Barbados disc au fond de la bouteille (visible depuis le dessus)
+    if (barbadosDisc) {
+      barbadosDisc.position.x = 0;
+      barbadosDisc.position.y = floatY - 1.35;
+      barbadosDisc.position.z = 0;
+      barbadosDisc.rotation.x = -Math.PI / 2; // face vers le haut
+      barbadosDisc.material.opacity = originsState.discOpacity;
+    }
   }
+
+  // Barbados photo overlay
+  if (overlayEl) overlayEl.style.opacity = originsState.overlayOpacity;
+
   renderer.render(scene, cam);
 })();
 
