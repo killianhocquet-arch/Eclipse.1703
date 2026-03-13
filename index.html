@@ -1430,11 +1430,12 @@ let elapsed = 0;
     if (reflectPlane) reflectPlane.position.x = sectionState.currentX;
     bottle.rotation.x += (mouseTiltX - bottle.rotation.x) * 0.05;
     bottle.rotation.z += (sectionState.currentTiltZ - bottle.rotation.z) * 0.06;
-    // Opacité bouteille (eclipse final)
+    // Opacité bouteille — eclipse final + fondu quand on est à l'intérieur
+    const effectiveOpacity = sectionState.bottleOpacity * (1 - originsState.insideGlass);
     bottle.traverse(c => {
       if (c.isMesh) {
         const mats = Array.isArray(c.material) ? c.material : [c.material];
-        mats.forEach(m => { m.transparent = true; m.opacity = sectionState.bottleOpacity; });
+        mats.forEach(m => { m.transparent = true; m.opacity = effectiveOpacity; });
       }
     });
 
