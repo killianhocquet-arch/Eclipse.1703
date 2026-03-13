@@ -1416,16 +1416,13 @@ let elapsed = 0;
     sectionState.currentTiltZ += (sectionState.targetTiltZ - sectionState.currentTiltZ) * 0.10;
     bottle.position.x  = sectionState.currentX;
     bottle.position.y  = floatY;
-    // Rotation idle héro — s'arrête quand on scrolle (déterministe au retour)
-    const heroFade = Math.max(0, 1 - scrollState.rotY / (Math.PI * 0.35));
-    idleRotY += dt * 0.22 * heroFade;
     // Parallaxe souris — lerp fluide vers la cible
     mouseTiltX += (mouseNY * 0.18 - mouseTiltX) * 0.08;
     mouseTiltY += (mouseNX * 0.18 - mouseTiltY) * 0.08;
     if (productSnapRotY !== null) {
       bottle.rotation.y += (productSnapRotY - bottle.rotation.y) * 0.05;
     } else {
-      bottle.rotation.y = scrollState.rotY + idleRotY + finalRotExtra + (originsState.active ? 0 : mouseTiltY);
+      bottle.rotation.y = scrollState.rotY + finalRotExtra + (originsState.active ? 0 : mouseTiltY);
     }
     if (reflectPlane) reflectPlane.position.x = sectionState.currentX;
     bottle.rotation.x += (mouseTiltX - bottle.rotation.x) * 0.05;
