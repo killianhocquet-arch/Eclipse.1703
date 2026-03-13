@@ -1265,22 +1265,21 @@ reveal(['ef-eyebrow', 'ef-title', 'ef-sub'], '#eclipse-final');
 gsap.timeline({ scrollTrigger: { trigger: '#traverse', start: 'top 65%', end: 'top 30%', scrub: 1 } })
   .to('#traverse-rule', { width: '340px', opacity: 0.35, duration: 1 });
 
-// ─── POSITION BOUTEILLE PAR SECTION ───────────────────
+// ─── POSITION BOUTEILLE PAR SECTION (scrub — déterministe) ───────────────
 [
   { id: '#cane',      x:  0.55, tz:  0.00 },
   { id: '#product',   x: -1.20, tz:  0.00 },
   { id: '#traverse',  x: -0.42, tz:  0.000 }, // tilt géré dynamiquement par ScrollTrigger dédié
-  { id: '#heritage',  x:  0.80, tz:  0.00 }, // recule à droite pour libérer le "1703"
+  { id: '#heritage',  x:  0.80, tz:  0.00 },
   { id: '#process',   x:  0.48, tz: -0.03 },
-  { id: '#cocktails', x:  0.00, tz: -0.26 }, // 15° tilt — bouteille tenue pour servir
+  { id: '#cocktails', x:  0.00, tz: -0.26 },
 ].forEach(({ id, x, tz }) => {
-  ScrollTrigger.create({
-    trigger: id, start: 'top 60%', end: 'bottom 40%',
-    onEnter:     () => { sectionState.targetX = x;  sectionState.targetTiltZ = tz; },
-    onEnterBack: () => { sectionState.targetX = x;  sectionState.targetTiltZ = tz; },
-    onLeave:     () => { sectionState.targetX = 0;  sectionState.targetTiltZ = 0;  },
-    onLeaveBack: () => { sectionState.targetX = 0;  sectionState.targetTiltZ = 0;  },
-  });
+  gsap.timeline({
+    scrollTrigger: { trigger: id, start: 'top 65%', end: 'bottom 35%', scrub: 1.0 }
+  })
+  .to(sectionState, { targetX: x,  targetTiltZ: tz, duration: 0.25, ease: 'power2.out' })
+  .to(sectionState, { targetX: x,  targetTiltZ: tz, duration: 0.50 })
+  .to(sectionState, { targetX: 0,  targetTiltZ: 0,  duration: 0.25, ease: 'power2.in'  });
 });
 
 // Product — studio packshot : lumières + snap rotation 3/4 face + reflet sol
@@ -1413,8 +1412,8 @@ let elapsed = 0;
     sectionState.cocktailsY    += (cocktailsYTarget    - sectionState.cocktailsY)    * 0.05;
     const floatY = scrollState.posY + Math.sin(elapsed * 0.65) * 0.045 + sectionState.traverseHoule + sectionState.cocktailsY;
     // Décalage latéral et inclinaison par section (lerp fluide)
-    sectionState.currentX     += (sectionState.targetX     - sectionState.currentX)     * 0.038;
-    sectionState.currentTiltZ += (sectionState.targetTiltZ - sectionState.currentTiltZ) * 0.038;
+    sectionState.currentX     += (sectionState.targetX     - sectionState.currentX)     * 0.10;
+    sectionState.currentTiltZ += (sectionState.targetTiltZ - sectionState.currentTiltZ) * 0.10;
     bottle.position.x  = sectionState.currentX;
     bottle.position.y  = floatY;
     // Rotation idle héro — s'arrête quand on scrolle (déterministe au retour)
