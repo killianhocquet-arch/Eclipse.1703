@@ -1088,19 +1088,6 @@ mtlLoader.load(OBJ_NAME + '.mtl', (materials) => {
     studioFillLight.position.set(-4, 1, 3); scene.add(studioFillLight);
     rimProductLight = new THREE.PointLight(0xc9a84c, 0, 15);
     rimProductLight.position.set(-3, 4, -2); scene.add(rimProductLight);
-    // Plan de reflet sol (section product) — gradient alpha canvas
-    const reflCanvas = document.createElement('canvas');
-    reflCanvas.width = 1; reflCanvas.height = 64;
-    const rCtx = reflCanvas.getContext('2d');
-    const rGrad = rCtx.createLinearGradient(0, 0, 0, 64);
-    rGrad.addColorStop(0, 'rgba(255,255,255,0)');
-    rGrad.addColorStop(1, 'rgba(255,255,255,1)');
-    rCtx.fillStyle = rGrad; rCtx.fillRect(0, 0, 1, 64);
-    const reflMat  = new THREE.MeshBasicMaterial({ color: 0x8899aa, transparent: true, opacity: 0, alphaMap: new THREE.CanvasTexture(reflCanvas), depthWrite: false });
-    reflectPlane = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 2.0), reflMat);
-    reflectPlane.rotation.x = -Math.PI / 2;
-    reflectPlane.position.y = -1.4;
-    scene.add(reflectPlane);
 
     bottle.scale.setScalar(0);
     gsap.to(bottle.scale, { x: sc, y: sc, z: sc, duration: 2.0, ease: 'back.out(1.1)', delay: 0.4 });
@@ -1290,7 +1277,6 @@ ScrollTrigger.create({
     gsap.to(studioKeyLight, { intensity: 4.0, duration: 0.6, overwrite: true });
     gsap.to(studioFillLight, { intensity: 1.0, duration: 0.6, overwrite: true });
     gsap.to(rimProductLight, { intensity: 3.0, duration: 0.4, overwrite: true });
-    if (reflectPlane) gsap.to(reflectPlane.material, { opacity: 0.3, duration: 0.5 });
     productSnapRotY = -0.4;
   },
   onEnterBack: () => {
@@ -1298,7 +1284,6 @@ ScrollTrigger.create({
     gsap.to(studioKeyLight, { intensity: 4.0, duration: 0.6, overwrite: true });
     gsap.to(studioFillLight, { intensity: 1.0, duration: 0.6, overwrite: true });
     gsap.to(rimProductLight, { intensity: 3.0, duration: 0.4, overwrite: true });
-    if (reflectPlane) gsap.to(reflectPlane.material, { opacity: 0.3, duration: 0.5 });
     productSnapRotY = -0.4;
   },
   onLeave: () => {
@@ -1306,7 +1291,6 @@ ScrollTrigger.create({
     gsap.to(studioKeyLight, { intensity: 0, duration: 0.4, overwrite: true });
     gsap.to(studioFillLight, { intensity: 0, duration: 0.4, overwrite: true });
     gsap.to(rimProductLight, { intensity: 0, duration: 0.3, overwrite: true });
-    if (reflectPlane) gsap.to(reflectPlane.material, { opacity: 0, duration: 0.3 });
     productSnapRotY = null;
   },
   onLeaveBack: () => {
@@ -1314,7 +1298,6 @@ ScrollTrigger.create({
     gsap.to(studioKeyLight, { intensity: 0, duration: 0.4, overwrite: true });
     gsap.to(studioFillLight, { intensity: 0, duration: 0.4, overwrite: true });
     gsap.to(rimProductLight, { intensity: 0, duration: 0.3, overwrite: true });
-    if (reflectPlane) gsap.to(reflectPlane.material, { opacity: 0, duration: 0.3 });
     productSnapRotY = null;
   },
 });
@@ -1424,7 +1407,6 @@ let elapsed = 0;
     } else {
       bottle.rotation.y = scrollState.rotY + finalRotExtra + (originsState.active ? 0 : mouseTiltY);
     }
-    if (reflectPlane) reflectPlane.position.x = sectionState.currentX;
     bottle.rotation.x += (mouseTiltX - bottle.rotation.x) * 0.05;
     bottle.rotation.z += (sectionState.currentTiltZ - bottle.rotation.z) * 0.06;
     // Opacité bouteille — eclipse final + fondu quand on est à l'intérieur
