@@ -520,14 +520,20 @@
     }
 
     /* ─── ECLIPSE FINAL ───────────────────────────────── */
+    @keyframes gradientSlide {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
     #eclipse-final { padding: 10rem 0; text-align: center; }
     .eclipse-title-final {
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(6rem, 26vw, 24rem);
       line-height: 0.8; letter-spacing: -0.01em;
-      background: linear-gradient(150deg, #ede6d6 0%, #c9a84c 45%, #7a4e18 100%);
+      background: linear-gradient(135deg, #c9a84c, #ede6d6, #c9a84c, #7a4e18, #c9a84c);
+      background-size: 300% auto;
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text; opacity: 0; transform: translateY(50px);
+      animation: gradientSlide 3s ease infinite alternate;
     }
     .eclipse-sub-final {
       margin-top: 1.8rem; font-size: 0.75rem;
@@ -1018,6 +1024,8 @@ let rimProductLight = null; // rim light dorée — section product
 let reflectPlane    = null; // plan de reflet sol — section product
 let productSnapRotY  = null; // snap rotation 3/4 face — section product
 let bottleBaseScale  = 1;    // scale normalisé de la bouteille (calculé au chargement)
+let mouseNX = 0, mouseNY = 0;       // position souris normalisée [-1, +1]
+let mouseTiltX = 0, mouseTiltY = 0; // tilt parallaxe lerpé (rotation.x et rotation.y additif)
 
 // Bottle
 let bottle = null;
@@ -1408,13 +1416,16 @@ let elapsed = 0;
     sectionState.currentTiltZ += (sectionState.targetTiltZ - sectionState.currentTiltZ) * 0.038;
     bottle.position.x  = sectionState.currentX;
     bottle.position.y  = floatY;
+    // Parallaxe souris — lerp fluide vers la cible
+    mouseTiltX += (mouseNY * 0.18 - mouseTiltX) * 0.08;
+    mouseTiltY += (mouseNX * 0.18 - mouseTiltY) * 0.08;
     if (productSnapRotY !== null) {
       bottle.rotation.y += (productSnapRotY - bottle.rotation.y) * 0.05;
     } else {
-      bottle.rotation.y = scrollState.rotY + elapsed * 0.22 + finalRotExtra;
+      bottle.rotation.y = scrollState.rotY + elapsed * 0.22 + finalRotExtra + (originsState.active ? 0 : mouseTiltY);
     }
     if (reflectPlane) reflectPlane.position.x = sectionState.currentX;
-    bottle.rotation.x += (0 - bottle.rotation.x) * 0.05;
+    bottle.rotation.x += (mouseTiltX - bottle.rotation.x) * 0.05;
     bottle.rotation.z += (sectionState.currentTiltZ - bottle.rotation.z) * 0.06;
     // Opacité bouteille (eclipse final)
     bottle.traverse(c => {
@@ -1454,6 +1465,12 @@ let elapsed = 0;
 
   renderer.render(scene, cam);
 })();
+
+// ─── MOUSE PARALLAX ───────────────────────────────────
+window.addEventListener('mousemove', e => {
+  mouseNX = (e.clientX / window.innerWidth  - 0.5) * 2;
+  mouseNY = (e.clientY / window.innerHeight - 0.5) * 2;
+});
 
 // ─── RESIZE ───────────────────────────────────────────
 window.addEventListener('resize', () => {
