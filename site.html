@@ -1205,6 +1205,8 @@ ScrollTrigger.create({
   },
   onLeave: () => {
     originsState.active = false;
+    originsState.camX = 0; originsState.camY = 0; originsState.camZ = 5;
+    originsState.lookTargetY = 0; originsState.discOpacity = 0;
     originsState.insideGlass = 0; originsState.glassFlash = 0;
   },
   onLeaveBack: () => {
