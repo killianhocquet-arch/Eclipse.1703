@@ -11,11 +11,14 @@
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --navy:  #060e1a;
-      --gold:  #c9a84c;
-      --cream: #ede6d6;
-      --dim:   rgba(237,230,214,0.45);
-      --nav-h: 5rem;
+      --navy:       #020509;
+      --gold:       #c9a84c;
+      --cream:      #ede6d6;
+      --dim:        rgba(237,230,214,0.45);
+      --nav-h:      5rem;
+      --glass-bg:   rgba(4, 10, 20, 0.55);
+      --glass-border: rgba(201,168,76,0.13);
+      --glass-blur: 18px;
     }
 
     html { scroll-behavior: smooth; }
@@ -118,7 +121,7 @@
 
     /* ─── CANVAS ──────────────────────────────────────── */
     #canvas-container {
-      position: fixed; inset: 0; z-index: 0;
+      position: fixed; inset: 0; z-index: 2;
     }
     canvas { display: block; }
 
@@ -175,6 +178,18 @@
     .section-inner {
       width: 100%; padding: 0 3rem;
     }
+    /* ── Verre sombre — panneaux glass-morphism ─────────── */
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border);
+      border-radius: 2px;
+      box-shadow:
+        inset 0 1px 0 rgba(201,168,76,0.07),
+        0 8px 40px rgba(0,0,0,0.45),
+        0 0 0 0.5px rgba(201,168,76,0.06);
+    }
     .eyebrow {
       font-size: 0.65rem; letter-spacing: 0.55em;
       text-transform: uppercase; color: var(--gold);
@@ -184,6 +199,74 @@
     .section-hr {
       position: absolute; bottom: 0; left: 3rem; right: 3rem;
       height: 1px; background: rgba(201,168,76,0.1);
+    }
+
+    /* ─── ECLIPSE HERO BG (z:-1, derrière canvas) ────── */
+    #eclipse-hero-bg {
+      position: fixed; inset: 0; z-index: 1;
+      pointer-events: none;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ehb-sun {
+      position: absolute;
+      width: min(480px, 75vw); height: min(480px, 75vw);
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        rgba(201,168,76,0.40) 0%,
+        rgba(201,168,76,0.15) 35%,
+        rgba(201,168,76,0.05) 60%,
+        transparent 75%);
+      box-shadow: 0 0 80px 40px rgba(201,168,76,0.08), 0 0 200px 80px rgba(201,168,76,0.04);
+    }
+    .ehb-moon {
+      position: absolute;
+      width: min(360px, 60vw); height: min(360px, 60vw);
+      border-radius: 50%;
+      background: #020509;
+      will-change: transform;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .ehb-corona {
+      position: absolute;
+      width: min(374px, 62vw); height: min(374px, 62vw);
+      border-radius: 50%;
+      opacity: 0.7;
+      box-shadow:
+        0 0 0 2px rgba(201,168,76,0.65),
+        0 0 20px 10px rgba(201,168,76,0.25),
+        0 0 70px 35px rgba(201,168,76,0.10),
+        0 0 140px 70px rgba(201,168,76,0.05);
+    }
+    .ehb-corona::before, .ehb-corona::after {
+      content: ''; position: absolute; inset: -40px; border-radius: 50%;
+      background: repeating-conic-gradient(rgba(201,168,76,0.06) 0deg 4deg, transparent 4deg 18deg);
+      animation: coronaSpin 60s linear infinite;
+    }
+    .ehb-corona::after {
+      inset: -60px; animation-duration: 90s; animation-direction: reverse;
+      background: repeating-conic-gradient(rgba(201,168,76,0.03) 0deg 2deg, transparent 2deg 12deg);
+    }
+    /* Hero Eclipse title */
+    .hero-eclipse-title {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(6rem, 22vw, 20rem);
+      line-height: 0.85; letter-spacing: -0.01em;
+      background: linear-gradient(135deg, #c9a84c, #ede6d6, #c9a84c, #7a4e18, #c9a84c);
+      background-size: 300% auto;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientSlide 3s ease infinite alternate;
+      white-space: nowrap; pointer-events: none; z-index: 1;
+    }
+    .hero-eclipse-sub {
+      position: absolute; bottom: 6rem; left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.65rem; letter-spacing: 0.5em;
+      text-transform: uppercase; color: var(--dim);
+      white-space: nowrap; z-index: 1;
     }
 
     /* ─── HERO ────────────────────────────────────────── */
@@ -311,7 +394,56 @@
     }
 
     /* ─── HERITAGE ────────────────────────────────────── */
-    #heritage { padding: 8rem 0; text-align: right; }
+    #heritage { padding: 8rem 0; min-height: 100vh; box-sizing: border-box; position: relative; text-align: center; }
+    /* Timeline en bas de section */
+    .heritage-timeline {
+      position: absolute; bottom: 0; left: 0;
+      width: 100%; height: 30vh;
+      top: auto; overflow: hidden;
+      opacity: 0; pointer-events: none; z-index: 1;
+    }
+    .heritage-timeline svg { width: 100%; height: 100%; }
+    .htl-event { opacity: 0; }
+    .htl-year  { font-family: 'Bebas Neue', sans-serif; font-size: 20px; fill: #c9a84c; letter-spacing: 2px; }
+    .htl-label { font-family: 'Cormorant Garamond', serif; font-size: 10px; fill: #c9a84c; opacity: 0.55; letter-spacing: 3px; text-transform: uppercase; }
+    .section-inner-heritage { position: relative; z-index: 0; opacity: 0 !important; pointer-events: none; }
+
+    /* ─── HERITAGE COUNTDOWN (combiné A+B) ──────────────── */
+    .heritage-countdown {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding-bottom: 30vh; /* vh = hauteur viewport, cohérent sur toutes tailles */
+      opacity: 0; pointer-events: none; z-index: 2;
+    }
+    @media (max-height: 680px) {
+      .heritage-countdown { padding-bottom: 36vh; }
+      .hc-eyebrow { margin-bottom: 0.5rem; }
+    }
+    .hc-eyebrow {
+      font-size: 0.6rem; letter-spacing: 0.55em; text-transform: uppercase;
+      color: var(--gold); opacity: 0.5; margin-bottom: 1.5rem;
+    }
+    .hc-year {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(8rem, 25vw, 23rem);
+      line-height: 0.85; letter-spacing: -0.01em;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      -webkit-text-stroke: 1px rgba(201,168,76,0.28);
+      transition: -webkit-text-fill-color 0.6s ease, -webkit-text-stroke-color 0.6s ease, filter 0.6s ease;
+    }
+    .hc-year.at-origin {
+      -webkit-text-fill-color: #c9a84c;
+      -webkit-text-stroke-color: rgba(201,168,76,0.15);
+      filter: drop-shadow(0 0 80px rgba(201,168,76,0.30));
+    }
+    .hc-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+      font-style: italic; letter-spacing: 0.35em;
+      color: var(--gold); opacity: 0; margin-top: 2rem;
+    }
     .heritage-year {
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(5rem, 22vw, 20rem);
@@ -322,65 +454,11 @@
     .heritage-body {
       font-size: clamp(0.9rem, 1.4vw, 1.05rem);
       font-style: italic; line-height: 2; color: var(--dim);
-      max-width: 380px; margin-left: auto; margin-top: 1.5rem;
+      max-width: 380px; margin-left: 0; margin-top: 1.5rem;
       opacity: 0; transform: translateY(16px);
     }
 
     /* ─── COCKTAILS ───────────────────────────────────── */
-    #cocktails { padding: 8rem 0; }
-    .cocktails-header {
-      display: flex; justify-content: space-between;
-      align-items: flex-end; margin-bottom: 4rem;
-    }
-    .cocktails-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(3rem, 8vw, 7rem);
-      line-height: 0.9; color: var(--cream);
-      opacity: 0; transform: translateY(30px);
-    }
-    .cocktails-link {
-      font-size: 0.6rem; letter-spacing: 0.45em;
-      text-transform: uppercase; color: var(--gold);
-      text-decoration: none; opacity: 0;
-      transform: translateY(16px);
-      border-bottom: 1px solid rgba(201,168,76,0.3);
-      padding-bottom: 0.2rem;
-    }
-    .cocktails-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
-    }
-    .cocktail-card {
-      border: 1px solid rgba(201,168,76,0.12);
-      padding: 2.5rem 2rem;
-      transition: border-color 0.3s;
-      opacity: 0; transform: translateY(24px);
-    }
-    .cocktail-card:hover { border-color: rgba(201,168,76,0.4); }
-    .cocktail-num {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 0.9rem; letter-spacing: 0.2em;
-      color: var(--gold); opacity: 0.5; margin-bottom: 1.2rem;
-    }
-    .cocktail-name {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(1.8rem, 3vw, 2.5rem);
-      letter-spacing: 0.04em; line-height: 1;
-      margin-bottom: 1rem;
-    }
-    .cocktail-desc {
-      font-size: 0.85rem; font-style: italic;
-      line-height: 1.9; color: var(--dim);
-      margin-bottom: 1.5rem;
-    }
-    .cocktail-ingredients {
-      list-style: none; border-top: 1px solid rgba(201,168,76,0.1);
-      padding-top: 1.2rem;
-    }
-    .cocktail-ingredients li {
-      font-size: 0.65rem; letter-spacing: 0.2em;
-      text-transform: uppercase; line-height: 2.2;
-      opacity: 0.45;
-    }
 
     /* ─── CANE ─────────────────────────────────────────── */
     #cane { padding: 8rem 0; }
@@ -414,10 +492,16 @@
     }
 
     /* ─── TRAVERSE ──────────────────────────────────────── */
-    #traverse { padding: 10rem 0; }
+    #traverse { padding: 10rem 0; position: relative; }
+    .traverse-map {
+      position: absolute; top: 0; bottom: 0; left: -5%;
+      width: 78%; height: 100%;
+      opacity: 0; pointer-events: none; z-index: 0;
+    }
     .traverse-inner {
       display: flex; flex-direction: column;
       align-items: flex-end; text-align: right;
+      position: relative; z-index: 1;
     }
     .traverse-label {
       font-size: 0.65rem; letter-spacing: 0.55em;
@@ -448,48 +532,19 @@
     }
 
     /* ─── PROCESS ───────────────────────────────────────── */
-    #process { padding: 8rem 0; }
-    .process-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(3rem, 8vw, 7rem);
-      line-height: 0.9; color: var(--cream);
-      margin-bottom: 5rem; opacity: 0; transform: translateY(30px);
-    }
-    .process-steps {
-      display: grid; grid-template-columns: repeat(5, 1fr);
-      gap: 2rem; position: relative;
-    }
-    .process-steps::before {
-      content: ''; position: absolute;
-      top: 0.6rem; left: 0; right: 0;
-      height: 1px; background: rgba(201,168,76,0.15);
-    }
-    .process-step {
-      position: relative; padding-top: 3rem;
-      opacity: 0; transform: translateY(20px);
-    }
-    .step-num {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 0.85rem; letter-spacing: 0.25em;
-      color: var(--gold); margin-bottom: 1.2rem;
-      display: flex; align-items: center; gap: 0.7rem;
-    }
-    .step-num::before {
-      content: ''; display: block;
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--gold); flex-shrink: 0;
-      position: absolute; top: -0.35rem; left: 0;
-    }
-    .step-name {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(1.2rem, 2vw, 1.8rem);
-      letter-spacing: 0.04em; line-height: 1;
-      color: var(--cream); margin-bottom: 0.8rem;
-    }
-    .step-desc {
-      font-size: 0.78rem; font-style: italic;
-      line-height: 1.9; color: var(--dim);
-    }
+    /* ─── PROCESS (pin) ─────────────────────────────────── */
+    #process { height: 100vh; overflow: hidden; display: flex; flex-direction: column; align-items: center; padding: 0; min-height: unset; }
+    .process-header { position: relative; z-index: 2; text-align: center; padding-top: 5rem; width: 100%; }
+    .process-pin-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 6vw, 5rem); line-height: 0.9; color: var(--cream); margin-bottom: 0; }
+    .process-stage { flex: 1; position: relative; width: 100%; }
+    .pcard { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 4rem; opacity: 0; pointer-events: none; }
+    .pcard-bnum { position: absolute; font-family: 'Bebas Neue', sans-serif; font-size: clamp(16rem, 32vw, 30rem); color: transparent; -webkit-text-fill-color: transparent; -webkit-text-stroke: 1px rgba(201,168,76,0.07); line-height: 1; pointer-events: none; user-select: none; z-index: 0; }
+    .pcard-label { font-family: 'Bebas Neue', sans-serif; font-size: 0.75rem; letter-spacing: 0.5em; color: var(--gold); margin-bottom: 1.2rem; position: relative; z-index: 1; }
+    .pcard-name { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 10vw, 8.5rem); line-height: 0.88; color: var(--cream); position: relative; z-index: 1; margin-bottom: 2rem; }
+    .pcard-desc { font-size: 0.88rem; font-style: italic; line-height: 2; color: var(--dim); max-width: 380px; position: relative; z-index: 1; }
+    .process-dots { position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%); display: flex; gap: 0.7rem; z-index: 3; }
+    .pdot { display: block; width: 5px; height: 5px; border-radius: 50%; background: rgba(201,168,76,0.25); transition: background 0.4s, box-shadow 0.4s, transform 0.4s; }
+    .pdot.active { background: var(--gold); box-shadow: 0 0 8px rgba(201,168,76,0.6); transform: scale(1.3); }
 
     /* ─── BOTTLE FADE ───────────────────────────────────── */
     #bottle-fade {
@@ -524,21 +579,104 @@
       0%   { background-position: 0% 50%; }
       100% { background-position: 100% 50%; }
     }
-    #eclipse-final { padding: 10rem 0; text-align: center; }
+    /* ── ECLIPSE FINAL ───────────────────────────────────── */
+    #eclipse-final {
+      height: 100vh; overflow: hidden;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 0; gap: 0;
+    }
+    .eclipse-stage {
+      position: relative; width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    /* Soleil — halo radial fixe */
+    .eclipse-sun {
+      position: absolute;
+      width: min(420px, 70vw); height: min(420px, 70vw);
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        rgba(201,168,76,0.45) 0%,
+        rgba(201,168,76,0.18) 35%,
+        rgba(201,168,76,0.06) 60%,
+        transparent 75%);
+      box-shadow:
+        0 0 60px 30px rgba(201,168,76,0.10),
+        0 0 150px 70px rgba(201,168,76,0.05);
+      pointer-events: none; z-index: 1;
+    }
+    /* Lune — disque sombre qui suit la souris */
+    .eclipse-moon {
+      position: absolute;
+      width: min(340px, 58vw); height: min(340px, 58vw);
+      border-radius: 50%;
+      background: #020509;
+      pointer-events: none; z-index: 3;
+      will-change: transform;
+    }
+    /* Corona — anneau visible à la totalité */
+    .eclipse-corona {
+      position: absolute;
+      width: min(352px, 60vw); height: min(352px, 60vw);
+      border-radius: 50%;
+      pointer-events: none; z-index: 2;
+      opacity: 0;
+      box-shadow:
+        0 0 0 2px rgba(201,168,76,0.70),
+        0 0 18px 8px  rgba(201,168,76,0.30),
+        0 0 60px 30px rgba(201,168,76,0.12),
+        0 0 120px 60px rgba(201,168,76,0.06);
+      transition: opacity 0.35s ease;
+    }
+    /* Rayons corona (pseudo-éléments) */
+    .eclipse-corona::before,
+    .eclipse-corona::after {
+      content: '';
+      position: absolute; inset: -40px;
+      border-radius: 50%;
+      background: repeating-conic-gradient(
+        rgba(201,168,76,0.07) 0deg 4deg,
+        transparent 4deg 18deg
+      );
+      animation: coronaSpin 60s linear infinite;
+    }
+    .eclipse-corona::after {
+      inset: -60px;
+      background: repeating-conic-gradient(
+        rgba(201,168,76,0.04) 0deg 2deg,
+        transparent 2deg 12deg
+      );
+      animation-duration: 90s;
+      animation-direction: reverse;
+    }
+    @keyframes coronaSpin { to { transform: rotate(360deg); } }
+    /* Texte centré sous l'éclipse */
+    .eclipse-content {
+      position: relative; z-index: 4;
+      margin-top: min(260px, 44vw);
+      text-align: center; pointer-events: none;
+    }
     .eclipse-title-final {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(6rem, 26vw, 24rem);
-      line-height: 0.8; letter-spacing: -0.01em;
+      font-size: clamp(5rem, 18vw, 13rem);
+      line-height: 0.85; letter-spacing: -0.01em;
       background: linear-gradient(135deg, #c9a84c, #ede6d6, #c9a84c, #7a4e18, #c9a84c);
       background-size: 300% auto;
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text; opacity: 0; transform: translateY(50px);
+      background-clip: text;
       animation: gradientSlide 3s ease infinite alternate;
+      opacity: 0;
     }
     .eclipse-sub-final {
-      margin-top: 1.8rem; font-size: 0.75rem;
+      margin-top: 1rem; font-size: 0.72rem;
       font-style: italic; letter-spacing: 0.4em;
-      opacity: 0; transform: translateY(16px); color: var(--dim);
+      color: var(--dim); opacity: 0;
+    }
+    .eclipse-hint {
+      margin-top: 2.5rem; font-size: 0.62rem;
+      letter-spacing: 0.35em; color: rgba(201,168,76,0.35);
+      text-transform: uppercase; opacity: 0;
     }
 
     /* ─── FOOTER ──────────────────────────────────────── */
@@ -627,6 +765,14 @@
 <!-- Barbados photo overlay -->
 <div id="barbados-overlay" aria-hidden="true"></div>
 
+
+<!-- Eclipse hero background CSS -->
+<div id="eclipse-hero-bg" aria-hidden="true">
+  <div class="ehb-sun"></div>
+  <div class="ehb-corona" id="ehb-corona"></div>
+  <div class="ehb-moon" id="ehb-moon"></div>
+</div>
+
 <!-- Bottle fade (eclipse final) -->
 <div id="bottle-fade" aria-hidden="true"></div>
 
@@ -635,34 +781,17 @@
 <div id="glass-flash" aria-hidden="true"></div>
 
 <!-- Grain -->
-<div class="grain"></div>
 
 <!-- Nav -->
-<nav id="main-nav">
-  <a href="#hero" class="nav-logo">Mount <span>Gay</span></a>
-  <ul class="nav-links">
-    <li><a href="#product">L'Eclipse</a></li>
-    <li><a href="#origins">Origines</a></li>
-    <li><a href="#heritage">Héritage</a></li>
-    <li><a href="#cocktails">Cocktails</a></li>
-  </ul>
-  <a href="#eclipse-final" class="nav-cta">Découvrir</a>
-</nav>
 
 <!-- HERO -->
 <section class="section" id="hero">
-  <div class="hero-ghost">ECLIPSE</div>
+  <h1 class="hero-eclipse-title">Eclipse</h1>
   <div class="hero-top-left">
-    <h1>Mount <span>Gay</span></h1>
+    <p style="font-family:'Bebas Neue';font-size:1.1rem;letter-spacing:0.12em;color:var(--cream)">Mount <span style="color:var(--gold)">Gay</span></p>
+    <p style="font-size:0.6rem;letter-spacing:0.45em;color:var(--dim);margin-top:0.3rem">Est. 1703 · Barbados</p>
   </div>
-  <div class="hero-top-right">
-    <p>Est. 1703</p>
-    <p>Eclipse</p>
-    <p>Barbados Rum</p>
-  </div>
-  <div class="hero-bottom-left">
-    <p>The World's Oldest Rum Distillery</p>
-  </div>
+  <p class="hero-eclipse-sub">À la recherche de la source originelle</p>
   <div class="scroll-indicator"><span>Scroll</span></div>
   <div class="section-hr"></div>
 </section>
@@ -740,6 +869,67 @@
 
 <!-- TRAVERSE -->
 <section class="section" id="traverse">
+  <!-- Carte atlantique — route maritime animée au scroll -->
+  <svg class="traverse-map" id="traverse-map" viewBox="0 0 1400 700" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="routeGlow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="4" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <!-- Grille de navigation (très subtile) -->
+    <g stroke="#c9a84c" stroke-width="0.5" opacity="0.08">
+      <line x1="0" y1="175" x2="1400" y2="175"/>
+      <line x1="0" y1="350" x2="1400" y2="350"/>
+      <line x1="0" y1="525" x2="1400" y2="525"/>
+      <line x1="233" y1="0" x2="233" y2="700"/>
+      <line x1="467" y1="0" x2="467" y2="700"/>
+      <line x1="700" y1="0" x2="700" y2="700"/>
+      <line x1="933" y1="0" x2="933" y2="700"/>
+      <line x1="1167" y1="0" x2="1167" y2="700"/>
+    </g>
+    <!-- Côte est Amérique du Nord + Caraïbes -->
+    <path d="M 155,20 C 175,75 192,145 200,220 C 208,285 212,350 222,410 C 232,455 245,488 262,515 C 272,535 285,558 305,575" stroke="#c9a84c" stroke-width="1.5" fill="none" opacity="0.22"/>
+    <!-- Îles Caraïbes (points) -->
+    <g fill="#c9a84c" opacity="0.30">
+      <ellipse cx="282" cy="492" rx="9" ry="5"/>
+      <ellipse cx="303" cy="503" rx="7" ry="4"/>
+      <ellipse cx="325" cy="498" rx="11" ry="5"/>
+      <ellipse cx="348" cy="488" rx="8" ry="4"/>
+      <ellipse cx="362" cy="496" rx="6" ry="3"/>
+    </g>
+    <!-- Amérique du Sud (côte NE) -->
+    <path d="M 305,575 C 330,595 368,615 415,630 C 460,643 510,652 565,658" stroke="#c9a84c" stroke-width="1.5" fill="none" opacity="0.18"/>
+    <!-- Côte ouest Europe (UK + France + Ibérie) -->
+    <path d="M 938,28 C 920,82 905,148 912,208 C 918,252 926,282 906,312 C 888,340 868,354 876,385 C 884,410 904,428 920,442 C 938,455 960,460 978,452 C 996,443 1012,428 1022,412" stroke="#c9a84c" stroke-width="1.5" fill="none" opacity="0.22"/>
+    <!-- Côte nord-ouest Afrique -->
+    <path d="M 1022,412 C 1035,450 1050,498 1060,552 C 1070,598 1078,645 1085,692" stroke="#c9a84c" stroke-width="1.5" fill="none" opacity="0.18"/>
+    <!-- Route maritime : Barbade → Bordeaux (se dessine au scroll) -->
+    <path id="traverse-route"
+      d="M 348,490 C 440,458 560,418 680,382 C 790,350 856,336 900,326"
+      stroke="#c9a84c" stroke-width="2.5" fill="none" stroke-linecap="round"
+      filter="url(#routeGlow)" opacity="0.85"/>
+    <!-- Marqueur départ — Barbade -->
+    <circle cx="348" cy="490" r="5" fill="#c9a84c" opacity="0.9"/>
+    <circle cx="348" cy="490" r="10" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.45"/>
+    <!-- Marqueur arrivée — Bordeaux -->
+    <circle id="traverse-dest" cx="900" cy="326" r="5" fill="#c9a84c" opacity="0"/>
+    <circle id="traverse-dest-ring" cx="900" cy="326" r="10" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0"/>
+    <!-- Labels -->
+    <text x="318" y="520" font-family="'Cormorant Garamond', serif" font-size="13" fill="#c9a84c" opacity="0.55" letter-spacing="2" text-anchor="middle">BARBADE</text>
+    <text x="900" y="308" font-family="'Cormorant Garamond', serif" font-size="13" fill="#c9a84c" opacity="0" id="traverse-label-dest" letter-spacing="2" text-anchor="middle">BORDEAUX</text>
+    <text x="624" y="310" font-family="'Cormorant Garamond', serif" font-size="18" font-style="italic" fill="#c9a84c" opacity="0.12" letter-spacing="4" text-anchor="middle">ATLANTIQUE</text>
+    <!-- Rose des vents (centre océan) -->
+    <g transform="translate(624,580)" stroke="#c9a84c" stroke-width="1" opacity="0.18" fill="none">
+      <line x1="0" y1="-22" x2="0" y2="22"/>
+      <line x1="-22" y1="0" x2="22" y2="0"/>
+      <line x1="-16" y1="-16" x2="16" y2="16"/>
+      <line x1="16" y1="-16" x2="-16" y2="16"/>
+      <circle cx="0" cy="0" r="8"/>
+      <polygon points="0,-22 -4,-10 0,-14 4,-10" fill="#c9a84c" opacity="0.35"/>
+    </g>
+  </svg>
+
   <div class="section-inner">
     <div class="traverse-inner">
       <div class="traverse-label" id="traverse-label">Depuis les Caraïbes · Vers le Monde</div>
@@ -759,8 +949,83 @@
 
 <!-- HERITAGE -->
 <section class="section" id="heritage">
-  <div class="section-inner" style="text-align:right">
-    <div class="eyebrow" id="heritage-eyebrow" style="text-align:right">Unbroken Since</div>
+  <!-- Timeline historique animée au scroll -->
+  <svg class="heritage-timeline" id="heritage-timeline" viewBox="0 60 1400 300" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <!-- Axe du temps : 2026 (droite) → 1703 (gauche), en sync avec le décompte -->
+    <!-- Scale : (1280-80)/(2026-1703) = 1200/323 ≈ 3.72 px/an -->
+    <path id="heritage-line" d="M 1280,210 L 80,210"
+      stroke="#c9a84c" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.65"/>
+    <!-- Grille horizontale légère -->
+    <line x1="80" y1="210" x2="1280" y2="210" stroke="#c9a84c" stroke-width="0.4" opacity="0.12"/>
+
+    <!-- 2026 — Aujourd'hui (haut) x=1280 -->
+    <g class="htl-event" id="htl-2026">
+      <line x1="1280" y1="197" x2="1280" y2="223" stroke="#c9a84c" stroke-width="1.5" opacity="0.55"/>
+      <circle cx="1280" cy="210" r="4" fill="#c9a84c" opacity="0.75"/>
+      <text x="1280" y="184" text-anchor="middle" class="htl-year">2026</text>
+      <text x="1280" y="168" text-anchor="middle" class="htl-label">Aujourd'hui</text>
+    </g>
+
+    <!-- 1945 — Paix mondiale (bas) x=80+(1945-1703)*3.74=80+905=985 -->
+    <g class="htl-event" id="htl-1945">
+      <line x1="985" y1="197" x2="985" y2="223" stroke="#c9a84c" stroke-width="1.5" opacity="0.50"/>
+      <circle cx="985" cy="210" r="4" fill="#c9a84c" opacity="0.65"/>
+      <text x="985" y="248" text-anchor="middle" class="htl-year">1945</text>
+      <text x="985" y="264" text-anchor="middle" class="htl-label">Paix mondiale</text>
+    </g>
+
+    <!-- 1889 — Tour Eiffel (haut) x=80+(1889-1703)*3.74=80+696=776 -->
+    <g class="htl-event" id="htl-1889">
+      <line x1="776" y1="197" x2="776" y2="223" stroke="#c9a84c" stroke-width="1.5" opacity="0.50"/>
+      <circle cx="776" cy="210" r="4" fill="#c9a84c" opacity="0.65"/>
+      <text x="776" y="184" text-anchor="middle" class="htl-year">1889</text>
+      <text x="776" y="168" text-anchor="middle" class="htl-label">Tour Eiffel</text>
+    </g>
+
+    <!-- 1815 — Waterloo (bas) x=80+(1815-1703)*3.74=80+419=499 -->
+    <g class="htl-event" id="htl-1815">
+      <line x1="499" y1="197" x2="499" y2="223" stroke="#c9a84c" stroke-width="1.5" opacity="0.50"/>
+      <circle cx="499" cy="210" r="4" fill="#c9a84c" opacity="0.65"/>
+      <text x="499" y="248" text-anchor="middle" class="htl-year">1815</text>
+      <text x="499" y="264" text-anchor="middle" class="htl-label">Waterloo</text>
+    </g>
+
+    <!-- 1776 — États-Unis (haut) x=80+(1776-1703)*3.74=80+273=353 -->
+    <g class="htl-event" id="htl-1776">
+      <line x1="353" y1="197" x2="353" y2="223" stroke="#c9a84c" stroke-width="1.5" opacity="0.50"/>
+      <circle cx="353" cy="210" r="4" fill="#c9a84c" opacity="0.65"/>
+      <text x="353" y="184" text-anchor="middle" class="htl-year">1776</text>
+      <text x="353" y="168" text-anchor="middle" class="htl-label">États-Unis</text>
+    </g>
+
+    <!-- 1703 — Mount Gay ★  x=80, texte aligné à gauche -->
+    <g class="htl-event" id="htl-1703">
+      <circle cx="80" cy="210" r="13" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.55"/>
+      <circle cx="80" cy="210" r="6"  fill="#c9a84c"/>
+      <!-- Texte à gauche du marqueur -->
+      <text x="30" y="178" text-anchor="start"
+            font-family="'Bebas Neue', sans-serif" font-size="28" fill="#c9a84c" letter-spacing="3">1703</text>
+      <text x="31" y="158" text-anchor="start" class="htl-label" opacity="0.85">Mount Gay fondé</text>
+      <text x="31" y="252" text-anchor="start"
+            font-family="'Cormorant Garamond', serif" font-size="11" fill="#c9a84c"
+            opacity="0.40" letter-spacing="4" font-style="italic">The Origin · Est.</text>
+    </g>
+
+    <!-- Légende -->
+    <text x="680" y="385" text-anchor="middle"
+          font-family="'Cormorant Garamond', serif" font-size="10"
+          fill="#c9a84c" opacity="0.18" letter-spacing="4">321 ANS D'HISTOIRE ININTERROMPUE</text>
+  </svg>
+
+  <!-- Countdown option A -->
+  <div class="heritage-countdown" id="heritage-countdown">
+    <div class="hc-eyebrow">Fondée en</div>
+    <div class="hc-year" id="hc-year">2026</div>
+    <div class="hc-sub" id="hc-sub">La plus ancienne distillerie de rhum au monde</div>
+  </div>
+
+  <div class="section-inner section-inner-heritage">
+    <div class="eyebrow" id="heritage-eyebrow">Unbroken Since</div>
     <h2 class="heritage-year" id="heritage-year">1703</h2>
     <p class="heritage-body" id="heritage-body">Des sols de calcaire corallien de la Barbade, un héritage distillé à travers les siècles. Mount Gay, la plus ancienne distillerie de rhum au monde encore en activité.</p>
   </div>
@@ -769,140 +1034,64 @@
 
 <!-- PROCESS -->
 <section class="section" id="process">
-  <div class="section-inner" style="padding-top:6rem;padding-bottom:6rem">
+  <div class="process-header">
     <div class="eyebrow" id="process-eyebrow">De la Terre au Verre</div>
-    <h2 class="process-title" id="process-title">Le Processus</h2>
-    <div class="process-steps">
-      <div class="process-step" id="process-1">
-        <div class="step-num">01</div>
-        <div class="step-name">Récolte</div>
-        <p class="step-desc">La canne est récoltée à la main, en saison sèche, au pic de sa concentration en sucres naturels.</p>
-      </div>
-      <div class="process-step" id="process-2">
-        <div class="step-num">02</div>
-        <div class="step-name">Fermentation</div>
-        <p class="step-desc">La mélasse fermente 36 à 48 heures avec des levures sélectionnées, développant ses arômes tropicaux.</p>
-      </div>
-      <div class="process-step" id="process-3">
-        <div class="step-num">03</div>
-        <div class="step-name">Distillation</div>
-        <p class="step-desc">Deux alambics distincts — colonne et pot still — produisent deux eaux-de-vie au caractère complémentaire.</p>
-      </div>
-      <div class="process-step" id="process-4">
-        <div class="step-num">04</div>
-        <div class="step-name">Vieillissement</div>
-        <p class="step-desc">En fûts de chêne américain, sous le soleil des Caraïbes. Le climat tropical accélère le dialogue bois-alcool.</p>
-      </div>
-      <div class="process-step" id="process-5">
-        <div class="step-num">05</div>
-        <div class="step-name">Assemblage</div>
-        <p class="step-desc">Le Maître de Chai compose l'Eclipse — équilibre parfait entre fraîcheur tropicale et profondeur boisée.</p>
-      </div>
+    <h2 class="process-pin-title" id="process-title">Le Processus</h2>
+  </div>
+  <div class="process-stage">
+    <div class="pcard" id="pcard-1">
+      <div class="pcard-bnum">01</div>
+      <div class="pcard-label">01 / 05</div>
+      <div class="pcard-name">Récolte</div>
+      <p class="pcard-desc">La canne est récoltée à la main, en saison sèche, au pic de sa concentration en sucres naturels.</p>
     </div>
+    <div class="pcard" id="pcard-2">
+      <div class="pcard-bnum">02</div>
+      <div class="pcard-label">02 / 05</div>
+      <div class="pcard-name">Fermentation</div>
+      <p class="pcard-desc">La mélasse fermente 36 à 48 heures avec des levures sélectionnées, développant ses arômes tropicaux.</p>
+    </div>
+    <div class="pcard" id="pcard-3">
+      <div class="pcard-bnum">03</div>
+      <div class="pcard-label">03 / 05</div>
+      <div class="pcard-name">Distillation</div>
+      <p class="pcard-desc">Deux alambics distincts — colonne et pot still — produisent deux eaux-de-vie au caractère complémentaire.</p>
+    </div>
+    <div class="pcard" id="pcard-4">
+      <div class="pcard-bnum">04</div>
+      <div class="pcard-label">04 / 05</div>
+      <div class="pcard-name">Vieillissement</div>
+      <p class="pcard-desc">En fûts de chêne américain, sous le soleil des Caraïbes. Le climat tropical accélère le dialogue bois-alcool.</p>
+    </div>
+    <div class="pcard" id="pcard-5">
+      <div class="pcard-bnum">05</div>
+      <div class="pcard-label">05 / 05</div>
+      <div class="pcard-name">Assemblage</div>
+      <p class="pcard-desc">Le Maître de Chai compose l'Eclipse — équilibre parfait entre fraîcheur tropicale et profondeur boisée.</p>
+    </div>
+  </div>
+  <div class="process-dots">
+    <span class="pdot active" id="pdot-1"></span>
+    <span class="pdot" id="pdot-2"></span>
+    <span class="pdot" id="pdot-3"></span>
+    <span class="pdot" id="pdot-4"></span>
+    <span class="pdot" id="pdot-5"></span>
   </div>
   <div class="section-hr"></div>
 </section>
 
 <!-- COCKTAILS -->
-<section class="section" id="cocktails">
-  <div class="section-inner" style="padding-top:6rem;padding-bottom:6rem">
-    <div class="cocktails-header">
-      <div>
-        <div class="eyebrow" id="cocktails-eyebrow">Mixologie</div>
-        <h2 class="cocktails-title" id="cocktails-title">Cocktails<br>Signature</h2>
-      </div>
-      <a href="#" class="cocktails-link" id="cocktails-link">Voir toutes les recettes</a>
-    </div>
-    <div class="cocktails-grid">
-      <div class="cocktail-card" id="cocktail-1">
-        <div class="cocktail-num">01</div>
-        <h3 class="cocktail-name">Eclipse &amp; Tonic</h3>
-        <p class="cocktail-desc">Fraîcheur tropicale et légèreté. Le cocktail emblématique de l'été à la Barbade.</p>
-        <ul class="cocktail-ingredients">
-          <li>5 cl Mount Gay Eclipse</li>
-          <li>15 cl Tonic Water</li>
-          <li>Zeste de lime · Glaçons</li>
-        </ul>
-      </div>
-      <div class="cocktail-card" id="cocktail-2">
-        <div class="cocktail-num">02</div>
-        <h3 class="cocktail-name">Eclipse Sour</h3>
-        <p class="cocktail-desc">L'acidité du citron rencontre la douceur du rhum. Un équilibre parfait entre vif et rond.</p>
-        <ul class="cocktail-ingredients">
-          <li>5 cl Mount Gay Eclipse</li>
-          <li>2 cl Jus de citron</li>
-          <li>1,5 cl Sirop de canne · Blanc d'œuf</li>
-        </ul>
-      </div>
-      <div class="cocktail-card" id="cocktail-3">
-        <div class="cocktail-num">03</div>
-        <h3 class="cocktail-name">1703 Old Fashioned</h3>
-        <p class="cocktail-desc">Un hommage à l'histoire. Complexe, profond, intemporel — comme la distillerie elle-même.</p>
-        <ul class="cocktail-ingredients">
-          <li>6 cl Mount Gay Eclipse</li>
-          <li>2 traits Angostura Bitters</li>
-          <li>1 sucre · Zeste d'orange</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <div class="section-hr"></div>
-</section>
 
 <!-- ECLIPSE FINAL -->
-<section class="section" id="eclipse-final" style="justify-content:center">
-  <div style="text-align:center;width:100%;padding:0 1rem">
-    <div class="eyebrow" id="ef-eyebrow" style="text-align:center">Mount Gay · Barbados</div>
+<section class="section" id="eclipse-final" style="justify-content:center;text-align:center">
+  <div style="padding:0 2rem">
+    <div class="eyebrow" id="ef-eyebrow">Mount Gay · Barbados</div>
     <h2 class="eclipse-title-final" id="ef-title">Eclipse</h2>
-    <p class="eclipse-sub-final" id="ef-sub">Crafted for those who seek the extraordinary</p>
+    <p class="eclipse-sub-final" id="ef-sub">À la recherche de la source originelle.</p>
   </div>
 </section>
 
 <!-- FOOTER -->
-<footer>
-  <div class="footer-top">
-    <div class="footer-brand">
-      <span class="footer-logo">Mount <span>Gay</span></span>
-      <p>La plus ancienne distillerie de rhum au monde. Barbados, depuis 1703.</p>
-      <div class="footer-social" style="margin-top:1.5rem">
-        <a href="#">Instagram</a>
-        <a href="#">Facebook</a>
-        <a href="#">YouTube</a>
-      </div>
-    </div>
-    <div class="footer-col">
-      <p class="footer-col-title">Le Rhum</p>
-      <ul>
-        <li><a href="#product">Eclipse</a></li>
-        <li><a href="#">XO Reserve</a></li>
-        <li><a href="#">Black Barrel</a></li>
-        <li><a href="#">1703</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <p class="footer-col-title">Découvrir</p>
-      <ul>
-        <li><a href="#origins">Origines</a></li>
-        <li><a href="#heritage">Héritage</a></li>
-        <li><a href="#cocktails">Cocktails</a></li>
-        <li><a href="#ar-section">Expérience AR</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <p class="footer-col-title">Informations</p>
-      <ul>
-        <li><a href="#">Mentions légales</a></li>
-        <li><a href="#">Confidentialité</a></li>
-        <li><a href="#">Contact</a></li>
-        <li><a href="#">Rémy Cointreau</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p class="footer-legal">L'abus d'alcool est dangereux pour la santé. À consommer avec modération.<br>La vente d'alcool est interdite aux mineurs.</p>
-    <p class="footer-copy">© Mount Gay Distilleries 2026</p>
-  </div>
-</footer>
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
@@ -919,8 +1108,7 @@
 
 <script type="module">
 import * as THREE from 'three';
-import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
-import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // ─── AGE GATE ─────────────────────────────────────────
 const ageGate = document.getElementById('age-gate');
@@ -949,7 +1137,7 @@ const canvas  = document.getElementById('three-canvas');
 const W = () => window.innerWidth;
 const H = () => window.innerHeight;
 
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(W(), H());
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -974,16 +1162,16 @@ const bgMat = new THREE.ShaderMaterial({
     uniform float uTime;
     uniform vec2  uRes;
     // 0 hero/cane  1 product/origins  2 traverse/heritage  3 process/cocktails  4 eclipse
-    vec3 bg0 = vec3(0.024, 0.043, 0.078);
-    vec3 bg1 = vec3(0.016, 0.028, 0.058);
-    vec3 bg2 = vec3(0.008, 0.014, 0.048);
-    vec3 bg3 = vec3(0.026, 0.015, 0.007);
-    vec3 bg4 = vec3(0.004, 0.004, 0.009);
-    vec3 g0  = vec3(0.200, 0.130, 0.030);
-    vec3 g1  = vec3(0.110, 0.085, 0.018);
-    vec3 g2  = vec3(0.038, 0.058, 0.130);
-    vec3 g3  = vec3(0.290, 0.160, 0.025);
-    vec3 g4  = vec3(0.240, 0.155, 0.042);
+    vec3 bg0 = vec3(0.020, 0.045, 0.090);
+    vec3 bg1 = vec3(0.014, 0.030, 0.065);
+    vec3 bg2 = vec3(0.008, 0.016, 0.050);
+    vec3 bg3 = vec3(0.006, 0.012, 0.038);
+    vec3 bg4 = vec3(0.004, 0.006, 0.022);
+    vec3 g0  = vec3(0.055, 0.085, 0.175);
+    vec3 g1  = vec3(0.038, 0.060, 0.140);
+    vec3 g2  = vec3(0.030, 0.050, 0.120);
+    vec3 g3  = vec3(0.025, 0.040, 0.095);
+    vec3 g4  = vec3(0.018, 0.028, 0.065);
     vec3 lerpV(vec3 a, vec3 b, float t) { return a + (b - a) * clamp(t, 0.0, 1.0); }
     void main() {
       vec2 uv = gl_FragCoord.xy / uRes;
@@ -991,32 +1179,36 @@ const bgMat = new THREE.ShaderMaterial({
       float d = length(p);
       float breathe = sin(uTime * 0.35) * 0.035 + 1.0;
       float pr = clamp(uProgress, 0.0, 4.0);
-      vec3 bg, gl_col;
-      if (pr < 1.0)      { bg = lerpV(bg0,bg1,pr);       gl_col = lerpV(g0,g1,pr); }
-      else if (pr < 2.0) { bg = lerpV(bg1,bg2,pr-1.0);   gl_col = lerpV(g1,g2,pr-1.0); }
-      else if (pr < 3.0) { bg = lerpV(bg2,bg3,pr-2.0);   gl_col = lerpV(g2,g3,pr-2.0); }
-      else               { bg = lerpV(bg3,bg4,pr-3.0);   gl_col = lerpV(g3,g4,pr-3.0); }
+      vec3 bg, glowCol;
+      if (pr < 1.0)      { bg = lerpV(bg0,bg1,pr);       glowCol = lerpV(g0,g1,pr); }
+      else if (pr < 2.0) { bg = lerpV(bg1,bg2,pr-1.0);   glowCol = lerpV(g1,g2,pr-1.0); }
+      else if (pr < 3.0) { bg = lerpV(bg2,bg3,pr-2.0);   glowCol = lerpV(g2,g3,pr-2.0); }
+      else               { bg = lerpV(bg3,bg4,pr-3.0);   glowCol = lerpV(g3,g4,pr-3.0); }
       float halo = (1.0 - smoothstep(0.0, 0.90 * breathe, d)) * 0.45;
-      vec3 col = bg + gl_col * halo;
+      vec3 col = bg + glowCol * halo;
       col *= 1.0 - smoothstep(0.45, 1.2, length(uv - 0.5));
-      gl_FragColor = vec4(col, 1.0);
+      gl_FragColor = vec4(col, 0.0);
     }
   `
 });
 scene.add(Object.assign(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat), { renderOrder: -1 }));
 
+// ── Eclipse 3D (derrière la bouteille via profondeur z) ──────────────
+
 // Lighting
-scene.add(new THREE.AmbientLight(0xd0c0a0, 0.4));
-const key = new THREE.DirectionalLight(0xffd060, 3.5);
+scene.add(new THREE.AmbientLight(0xa0a8b8, 0.4));
+const key = new THREE.DirectionalLight(0xffffff, 2.5);
 key.position.set(2, 3, 4); scene.add(key);
 const fill = new THREE.DirectionalLight(0x2040a0, 0.8);
 fill.position.set(-3, 0, 1); scene.add(fill);
-const rim = new THREE.DirectionalLight(0xffb020, 2.2);
+const rim = new THREE.DirectionalLight(0xdde4f0, 1.6);
 rim.position.set(0.5, -3, -2); scene.add(rim);
 const keyBase = key.intensity; // valeur nominale — restaurée à la sortie des sections
 let caneLight           = null; // lumière ambrée chaude — section canne à sucre
-let traverseHouleTarget = 0; // houle Y dynamique — section traverse
-let cocktailsYTarget    = 0; // drift Y vers le haut — section cocktails (bouteille levée)
+let traverseHouleTarget    = 0;     // houle Y dynamique — section traverse
+let traverseRocking        = false; // animation temporelle active dans #traverse
+let traverseBottleHideTgt  = 0;     // cible opacité masquage bouteille en #traverse
+let traverseBottleHide     = 0;     // valeur lerpée
 let finalRotExtra       = 0; // rotation 360° additive — section finale / footer
 let studioKeyLight  = null; // lumière blanche directionnelle — section product
 let studioFillLight = null; // fill bleu-gris — section product
@@ -1041,33 +1233,39 @@ let interiorLight  = null;
 let glassRing      = null;
 let currentLookY   = 0;
 const sectionState  = { targetX: 0, targetTiltZ: 0, currentX: 0, currentTiltZ: 0, bottleOpacity: 1 };
+const HERITAGE_VISUAL = 'combined'; // 'combined' | 'countdown' | 'timeline'
 const bottleFadeEl  = document.getElementById('bottle-fade');
 
-const OBJ_BASE = 'assets/Meshy_AI_Whiskey_Bottle_0312102948_texture_obj/';
-const OBJ_NAME = 'Meshy_AI_Whiskey_Bottle_0312102948_texture';
-
-const mtlLoader = new MTLLoader();
-mtlLoader.setPath(OBJ_BASE);
-mtlLoader.load(OBJ_NAME + '.mtl', (materials) => {
-  materials.preload();
-  const objLoader = new OBJLoader();
-  objLoader.setMaterials(materials);
-  objLoader.setPath(OBJ_BASE);
-  objLoader.load(OBJ_NAME + '.obj', (obj) => {
-    bottle = obj;
+const gltfLoader = new GLTFLoader();
+gltfLoader.load('assets/bouteille de merde.glb', (gltf) => {
+  const obj = gltf.scene;
+  bottle = obj;
     const box = new THREE.Box3().setFromObject(bottle);
     const size = box.getSize(new THREE.Vector3());
     const ctr  = box.getCenter(new THREE.Vector3());
-    const sc   = 2.8 / Math.max(size.x, size.y, size.z);
+    const sc   = 1.8 / Math.max(size.x, size.y, size.z);
     bottleBaseScale = sc; // stocker pour les animations de scale (heritage, etc.)
     bottle.scale.setScalar(sc);
     bottle.position.copy(ctr.multiplyScalar(-sc));
     scene.add(bottle);
-    // Vue depuis l'intérieur : double-sided pour voir les parois en verre
+    const liquidMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xC47A2B,
+      transmission: 0.9,
+      roughness: 0.0,
+      ior: 1.36,
+      thickness: 1.0,
+      transparent: true,
+    });
     bottle.traverse(c => {
       if (c.isMesh) {
         const mats = Array.isArray(c.material) ? c.material : [c.material];
         mats.forEach(m => { m.side = THREE.DoubleSide; });
+        // Appliquer le matériau liquide au mesh "liquid"
+        const matName = Array.isArray(c.material) ? c.material[0]?.name : c.material?.name;
+        if (c.name === 'liquideRhum') {
+          c.material = liquidMaterial;
+          console.log('[liquid] matériau appliqué sur :', c.name, '/ mat:', matName);
+        }
       }
     });
     // Lumière ambrée intérieure
@@ -1093,40 +1291,8 @@ mtlLoader.load(OBJ_NAME + '.mtl', (materials) => {
     gsap.to(bottle.scale, { x: sc, y: sc, z: sc, duration: 2.0, ease: 'back.out(1.1)', delay: 0.4 });
 
     // ─── Barbados disc (inside bottle base) ──────────────
-    const bCanvas = document.createElement('canvas');
-    bCanvas.width = 512; bCanvas.height = 512;
-    const bCtx = bCanvas.getContext('2d');
-    // Ocean
-    const oceanGrad = bCtx.createRadialGradient(256, 256, 0, 256, 256, 256);
-    oceanGrad.addColorStop(0, '#0e6a8a'); oceanGrad.addColorStop(1, '#041c38');
-    bCtx.fillStyle = oceanGrad; bCtx.fillRect(0, 0, 512, 512);
-    // Reef ring
-    bCtx.beginPath(); bCtx.arc(256, 256, 200, 0, Math.PI * 2);
-    bCtx.strokeStyle = 'rgba(180,140,80,0.25)'; bCtx.lineWidth = 12; bCtx.stroke();
-    // Island (Barbados: tall teardrop, slightly tilted)
-    bCtx.save(); bCtx.translate(256, 248); bCtx.rotate(-0.18);
-    const islandGrad = bCtx.createRadialGradient(-10, -30, 0, 0, 0, 130);
-    islandGrad.addColorStop(0, '#4aab62'); islandGrad.addColorStop(0.6, '#2d7a44'); islandGrad.addColorStop(1, '#1a5530');
-    bCtx.beginPath();
-    bCtx.moveTo(0, -130);
-    bCtx.bezierCurveTo(60, -90, 90, 10, 70, 90);
-    bCtx.bezierCurveTo(50, 140, -50, 140, -70, 90);
-    bCtx.bezierCurveTo(-90, 10, -60, -90, 0, -130);
-    bCtx.fillStyle = islandGrad; bCtx.fill();
-    // Highlands highlight
-    bCtx.beginPath(); bCtx.ellipse(-8, -40, 38, 55, 0.15, 0, Math.PI * 2);
-    bCtx.fillStyle = 'rgba(90,185,110,0.4)'; bCtx.fill();
-    bCtx.restore();
-    // Bridgetown dot
-    bCtx.beginPath(); bCtx.arc(222, 300, 7, 0, Math.PI * 2);
-    bCtx.fillStyle = '#c9a84c'; bCtx.fill();
-    bCtx.beginPath(); bCtx.arc(222, 300, 12, 0, Math.PI * 2);
-    bCtx.strokeStyle = 'rgba(201,168,76,0.5)'; bCtx.lineWidth = 2; bCtx.stroke();
-    // Coordinates
-    bCtx.fillStyle = 'rgba(201,168,76,0.9)';
-    bCtx.font = 'bold 22px monospace'; bCtx.textAlign = 'center';
-    bCtx.fillText("13°10'N  59°32'W", 256, 460);
-    const barbadosTex = new THREE.CanvasTexture(bCanvas);
+    const barbadosTex = new THREE.TextureLoader().load('assets/V26 - 2026-03-15 15.14.21.jpg');
+    barbadosTex.colorSpace = THREE.SRGBColorSpace;
     barbadosDisc = new THREE.Mesh(
       new THREE.CircleGeometry(0.33, 64),
       new THREE.MeshBasicMaterial({ map: barbadosTex, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false })
@@ -1138,13 +1304,12 @@ mtlLoader.load(OBJ_NAME + '.mtl', (materials) => {
     ScrollTrigger.create({
       trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 2.5,
       onUpdate: (s) => {
-        scrollState.rotY = s.progress * Math.PI * 2;
+        scrollState.rotY = 0;
         scrollState.posY = -s.progress * 0.6;
       }
     });
     finishLoader();
   }, (xhr) => { if (xhr.total) updateLoader(xhr.loaded / xhr.total); });
-});
 
 // ─── Progression chromatique globale (0→4 sur toute la page) ──
 ScrollTrigger.create({
@@ -1160,11 +1325,19 @@ ScrollTrigger.create({
   pin: true,
   scrub: 1.0,
   onEnter: () => { originsState.active = true; },
+  onLeaveBack: () => { originsState.active = false; },
   onUpdate: (s) => {
     const p = s.progress;
     // Easing smoothstep
     function ss(t) { const c = Math.max(0, Math.min(1, t)); return c * c * (3 - 2 * c); }
     function cl(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+    // Texte Barbados — visible avant le zoom, disparaît dès que ça commence
+    const textOpacity = cl(1 - (p - 0.05) / 0.15, 0, 1);
+    ['origins-eyebrow','origins-title','origins-coords','origins-body'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.opacity = textOpacity;
+    });
 
     let cy, cz, ly;
 
@@ -1200,20 +1373,25 @@ ScrollTrigger.create({
     // Atmosphère intérieure — s'installe dès qu'on est passé
     originsState.insideGlass = cl((p - 0.52) / 0.15, 0, 1);
 
-    // Carte de la Barbade — visible une fois bien à l'intérieur
-    originsState.discOpacity = cl((p - 0.64) / 0.22, 0, 1);
+    // Carte de la Barbade — fade-in puis fade-out smooth avant la sortie
+    const discIn  = cl((p - 0.64) / 0.18, 0, 1);
+    const discOut = cl(1 - (p - 0.84) / 0.14, 0, 1);
+    originsState.discOpacity = discIn * discOut;
   },
   onLeave: () => {
     originsState.active = false;
     originsState.camX = 0; originsState.camY = 0; originsState.camZ = 5;
     originsState.lookTargetY = 0; originsState.discOpacity = 0;
     originsState.insideGlass = 0; originsState.glassFlash = 0;
+    traverseBottleHideTgt = 1;
+    traverseBottleHide = 1; // force immédiat — évite le flash de réapparition
   },
   onLeaveBack: () => {
     originsState.active = false;
     originsState.camX = 0; originsState.camY = 0; originsState.camZ = 5;
     originsState.lookTargetY = 0; originsState.discOpacity = 0;
     originsState.insideGlass = 0; originsState.glassFlash = 0;
+    traverseBottleHideTgt = 0; // remonte vers Product/Hero → bouteille réapparaît
   }
 });
 
@@ -1246,22 +1424,56 @@ reveal(['product-eyebrow', 'product-title', 'product-body'], '#product');
 reveal(['origins-eyebrow', 'origins-title', 'origins-coords', 'origins-body'], '#origins');
 reveal(['traverse-label', 'traverse-quote', 'traverse-meta'], '#traverse');
 reveal(['heritage-eyebrow', 'heritage-year', 'heritage-body'], '#heritage');
-reveal(['process-eyebrow', 'process-title', 'process-1', 'process-2', 'process-3', 'process-4', 'process-5'], '#process', 0.08);
-reveal(['cocktails-eyebrow', 'cocktails-title', 'cocktails-link', 'cocktail-1', 'cocktail-2', 'cocktail-3'], '#cocktails');
-reveal(['ef-eyebrow', 'ef-title', 'ef-sub'], '#eclipse-final');
+// ── ECLIPSE FINAL — interaction souris ──────────────────────────────
+// ── Eclipse hero bg — souris + fade au scroll ────────
+
+// ── Eclipse hero CSS — souris sur lune uniquement ───────
+(function initEclipseHero() {
+  const moon   = document.getElementById('ehb-moon');
+  const bg     = document.getElementById('eclipse-hero-bg');
+  const MAX = 150;
+  let tgtX = 0, tgtY = 0, curX = 0, curY = 0;
+
+  document.addEventListener('mousemove', e => {
+    let dx = e.clientX - window.innerWidth  / 2;
+    let dy = e.clientY - window.innerHeight / 2;
+    const d = Math.sqrt(dx*dx + dy*dy);
+    if (d > MAX) { dx = dx/d*MAX; dy = dy/d*MAX; }
+    tgtX = dx; tgtY = dy;
+  });
+
+  window.addEventListener('scroll', () => {
+    bg.style.opacity = Math.max(0, 1 - window.scrollY / window.innerHeight);
+  }, { passive: true });
+
+  (function tick() {
+    curX += (tgtX - curX) * 0.06;
+    curY += (tgtY - curY) * 0.06;
+    moon.style.transform = `translate(calc(-50% + ${curX}px), calc(-50% + ${curY}px))`;
+    requestAnimationFrame(tick);
+  })();
+})();
+
+// Reveal texte eclipse-final
+ScrollTrigger.create({
+  trigger: '#eclipse-final', start: 'top 70%', once: true,
+  onEnter: () => gsap.to(['#ef-eyebrow','#ef-title','#ef-sub'], {
+    opacity: 1, y: 0, duration: 0.9, stagger: 0.18, ease: 'power2.out'
+  })
+});
 
 // Ligne traverse — se dessine au scroll
 gsap.timeline({ scrollTrigger: { trigger: '#traverse', start: 'top 65%', end: 'top 30%', scrub: 1 } })
   .to('#traverse-rule', { width: '340px', opacity: 0.35, duration: 1 });
 
+
 // ─── POSITION BOUTEILLE PAR SECTION (scrub — déterministe) ───────────────
 [
   { id: '#cane',      x:  1.10, tz:  0.00 },
   { id: '#product',   x: -0.80, tz:  0.00 },
-  { id: '#traverse',  x: -0.42, tz:  0.000 }, // tilt géré dynamiquement par ScrollTrigger dédié
+  { id: '#traverse',  x: -0.30, tz:  0.000 }, // bouteille centrée sur le voilier SVG
   { id: '#heritage',  x:  0.80, tz:  0.00 },
   { id: '#process',   x:  0.48, tz: -0.03 },
-  { id: '#cocktails', x:  0.00, tz: -0.26 },
 ].forEach(({ id, x, tz }) => {
   gsap.timeline({
     scrollTrigger: { trigger: id, start: 'top 65%', end: 'bottom 35%', scrub: 1.0 }
@@ -1316,43 +1528,150 @@ ScrollTrigger.create({
   onLeaveBack: () => { gsap.to(caneLight, { intensity: 0, duration: 0.4, overwrite: true }); gsap.to(key, { intensity: keyBase, duration: 0.3, overwrite: true }); },
 });
 
-// Cocktails — drift Y vers le haut (bouteille levée pour servir)
-ScrollTrigger.create({
-  trigger: '#cocktails', start: 'top 60%', end: 'bottom 40%',
-  onEnter:     () => { cocktailsYTarget = 0.3; },
-  onEnterBack: () => { cocktailsYTarget = 0.3; },
-  onLeave:     () => { cocktailsYTarget = 0; },
-  onLeaveBack: () => { cocktailsYTarget = 0; },
-});
 
-// Traverse — roulis sinusoïdal (balancement navire)
-ScrollTrigger.create({
-  trigger: '#traverse', start: 'top 60%', end: 'bottom 40%', scrub: 1.0,
-  onUpdate: (s) => {
-    sectionState.targetTiltZ = Math.sin(s.progress * Math.PI * 2) * 0.18;
-    traverseHouleTarget      = Math.cos(s.progress * Math.PI) * 0.10;
-  },
-  onLeave:     () => { sectionState.targetTiltZ = 0; traverseHouleTarget = 0; },
-  onLeaveBack: () => { sectionState.targetTiltZ = 0; traverseHouleTarget = 0; },
-});
+// Traverse — pin + route maritime + masquage bouteille
+(function initTraversePin() {
+  const routeEl = document.getElementById('traverse-route');
+  if (!routeEl) return;
+  const len = routeEl.getTotalLength();
+  routeEl.style.strokeDasharray = len;
+  routeEl.style.strokeDashoffset = len;
 
-// Heritage — recul bouteille (scale 60% pour libérer l'espace du "1703")
-ScrollTrigger.create({
-  trigger: '#heritage', start: 'top 60%', end: 'bottom 40%',
-  onEnter:     () => { if (bottle) gsap.to(bottle.scale, { x: bottleBaseScale * 0.6, y: bottleBaseScale * 0.6, z: bottleBaseScale * 0.6, duration: 0.7, ease: 'power2.out', overwrite: true }); },
-  onEnterBack: () => { if (bottle) gsap.to(bottle.scale, { x: bottleBaseScale * 0.6, y: bottleBaseScale * 0.6, z: bottleBaseScale * 0.6, duration: 0.7, ease: 'power2.out', overwrite: true }); },
-  onLeave:     () => { if (bottle) gsap.to(bottle.scale, { x: bottleBaseScale,       y: bottleBaseScale,       z: bottleBaseScale,       duration: 0.5, ease: 'power2.out', overwrite: true }); },
-  onLeaveBack: () => { if (bottle) gsap.to(bottle.scale, { x: bottleBaseScale,       y: bottleBaseScale,       z: bottleBaseScale,       duration: 0.5, ease: 'power2.out', overwrite: true }); },
-});
+  gsap.timeline({
+    scrollTrigger: {
+      trigger: '#traverse',
+      start: 'top top',
+      end: '+=1800',
+      pin: true,
+      scrub: 1.5,
+      onEnter:     () => { traverseRocking = true;  traverseBottleHideTgt = 1; },
+      onLeave:     () => { traverseRocking = false; traverseBottleHideTgt = 1; sectionState.targetTiltZ = 0; traverseHouleTarget = 0; }, // → Heritage : reste cachée
+      onEnterBack: () => { traverseRocking = true;  traverseBottleHideTgt = 1; },
+      onLeaveBack: () => { traverseRocking = false; traverseBottleHideTgt = 1; sectionState.targetTiltZ = 0; traverseHouleTarget = 0; }, // ← Origins : reste cachée
+    }
+  })
+  .to('#traverse-map', { opacity: 1, ease: 'none', duration: 0.18 })
+  .to(routeEl, { strokeDashoffset: 0, ease: 'none', duration: 0.58 }, 0.15)
+  .to(['#traverse-dest', '#traverse-dest-ring', '#traverse-label-dest'], { opacity: 0.9, ease: 'none', duration: 0.08 }, 0.75)
+  .to({}, { duration: 0.08 })                                                 // pause — route complète visible
+  .to(['#traverse-map', '#traverse-dest', '#traverse-dest-ring', '#traverse-label-dest'],
+      { opacity: 0, ease: 'power2.in', duration: 0.15 });                    // fondu disparition
+})();
 
-// Heritage — shimmer sur le "1703" quand la section est active
-ScrollTrigger.create({
-  trigger: '#heritage', start: 'top 60%', end: 'bottom 40%',
-  onEnter:     () => document.getElementById('heritage-year').classList.add('glow'),
-  onLeave:     () => document.getElementById('heritage-year').classList.remove('glow'),
-  onEnterBack: () => document.getElementById('heritage-year').classList.add('glow'),
-  onLeaveBack: () => document.getElementById('heritage-year').classList.remove('glow'),
-});
+// Heritage — pin + visuel (feature flag HERITAGE_VISUAL)
+(function initHeritagePin() {
+  const yearEl = document.getElementById('heritage-year');
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: '#heritage',
+      start: 'top top',
+      end: '+=1800',
+      pin: true,
+      scrub: 1.5,
+      onEnter:     () => { traverseBottleHideTgt = 1; yearEl.classList.add('glow'); },
+      onLeave:     () => { traverseBottleHideTgt = 1; yearEl.classList.remove('glow'); }, // reste cachée après 1703
+      onEnterBack: () => { traverseBottleHideTgt = 1; yearEl.classList.add('glow'); },
+      onLeaveBack: () => { traverseBottleHideTgt = 1; yearEl.classList.remove('glow'); },
+    }
+  });
+
+  if (HERITAGE_VISUAL === 'combined' || HERITAGE_VISUAL === 'countdown') {
+    // ── A+B combinés : décompte centré + timeline en bas synchronisés ─
+    const hcYearEl = document.getElementById('hc-year');
+    const counter  = { val: 2026 };
+    hcYearEl.textContent = '2026'; // valeur initiale garantie
+
+    // Préparer la ligne SVG si mode combined
+    if (HERITAGE_VISUAL === 'combined') {
+      const lineEl = document.getElementById('heritage-line');
+      if (lineEl) {
+        const len = lineEl.getTotalLength();
+        lineEl.style.strokeDasharray = len;
+        lineEl.style.strokeDashoffset = len;
+        tl.to('#heritage-timeline', { opacity: 1, ease: 'none', duration: 0.10 }, 0.10)
+          .to(lineEl, { strokeDashoffset: 0, ease: 'none', duration: 0.62 }, 0.12)
+          // Marqueurs : ordre inverse (2026 d'abord, 1703 en dernier — ligne dessine droite→gauche)
+          .to('#htl-2026', { opacity: 1, ease: 'none', duration: 0.06 }, 0.14)
+          .to('#htl-1945', { opacity: 1, ease: 'none', duration: 0.06 }, 0.27)
+          .to('#htl-1889', { opacity: 1, ease: 'none', duration: 0.06 }, 0.39)
+          .to('#htl-1815', { opacity: 1, ease: 'none', duration: 0.06 }, 0.51)
+          .to('#htl-1776', { opacity: 1, ease: 'none', duration: 0.06 }, 0.61)
+          .to('#htl-1703', { opacity: 1, ease: 'none', duration: 0.07 }, 0.73);
+      }
+    }
+
+    tl
+      .to('#heritage-countdown', { opacity: 1, ease: 'none', duration: 0.10 }, 0.10)
+      .to(counter, {
+        val: 1703, ease: 'none', duration: 0.65,
+        onUpdate: () => {
+          const yr = Math.round(counter.val);
+          hcYearEl.textContent = yr;
+          // Retire at-origin si on remonte au scroll
+          if (yr > 1703) hcYearEl.classList.remove('at-origin');
+        }
+      }, 0.12)
+      .call(() => { hcYearEl.classList.add('at-origin'); }, null, 0.77)
+      .to('#hc-sub', { opacity: 0.7, ease: 'none', duration: 0.08 }, 0.77)
+      .to({}, { duration: 0.12 })
+      .to(['#heritage-countdown', '#heritage-timeline'], { opacity: 0, ease: 'power2.in', duration: 0.14 });
+
+  } else {
+    // ── Option B seul : timeline 1703 → 2026 ─────────────────────
+    const lineEl = document.getElementById('heritage-line');
+    if (!lineEl) return;
+    const len = lineEl.getTotalLength();
+    lineEl.style.strokeDasharray = len;
+    lineEl.style.strokeDashoffset = len;
+    tl
+      .to('#heritage-timeline', { opacity: 1, ease: 'none', duration: 0.12 })
+      .to(lineEl, { strokeDashoffset: 0, ease: 'none', duration: 0.62 }, 0.10)
+      .to('#htl-1703', { opacity: 1, ease: 'none', duration: 0.08 }, 0.10)
+      .to('#htl-1776', { opacity: 1, ease: 'none', duration: 0.07 }, 0.24)
+      .to('#htl-1815', { opacity: 1, ease: 'none', duration: 0.07 }, 0.34)
+      .to('#htl-1889', { opacity: 1, ease: 'none', duration: 0.07 }, 0.46)
+      .to('#htl-1945', { opacity: 1, ease: 'none', duration: 0.07 }, 0.57)
+      .to('#htl-2026', { opacity: 1, ease: 'none', duration: 0.08 }, 0.70)
+      .to({}, { duration: 0.12 })
+      .to('#heritage-timeline', { opacity: 0, ease: 'power2.in', duration: 0.14 });
+  }
+})();
+
+// ─── PROCESS — pin + étapes séquentielles (après traverse+heritage) ──────
+(function initProcessPin() {
+  const cards = [1,2,3,4,5].map(n => document.getElementById('pcard-' + n));
+  const dots  = [1,2,3,4,5].map(n => document.getElementById('pdot-' + n));
+
+  // États initiaux explicites
+  gsap.set('#process-eyebrow', { opacity: 0, y: 18 });
+  gsap.set('#process-title',   { opacity: 0, y: 20 });
+  gsap.set(cards,              { opacity: 0 });
+  gsap.set('.pcard-bnum',      { y: 60 });
+  gsap.set('.pcard-label, .pcard-name, .pcard-desc', { y: 20 });
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: '#process', start: 'top top', end: '+=2500',
+      pin: true, scrub: 1.2,
+      onUpdate: (self) => {
+        const step = Math.min(4, Math.floor(self.progress * 5.1));
+        dots.forEach((d, i) => d.classList.toggle('active', i === step));
+      }
+    }
+  });
+
+  tl.to('#process-eyebrow', { opacity: 1, y: 0, duration: 0.2 })
+    .to('#process-title',   { opacity: 1, y: 0, duration: 0.25 }, '<0.1');
+
+  cards.forEach((card, i) => {
+    const bnum  = card.querySelector('.pcard-bnum');
+    const inner = [card.querySelector('.pcard-label'), card.querySelector('.pcard-name'), card.querySelector('.pcard-desc')];
+    if (i > 0) tl.to(cards[i-1], { opacity: 0, duration: 0.25 }, '+=0.5');
+    tl.to(card,  { opacity: 1, duration: 0.3 }, i === 0 ? '+=0.2' : '<0.1')
+      .to(bnum,  { y: 0, duration: 0.5 }, '<')
+      .to(inner, { y: 0, stagger: 0.06, duration: 0.3 }, '<0.1');
+  });
+})();
 
 // Final — rotation 360° complète dans le footer (dernier salut de la bouteille)
 ScrollTrigger.create({
@@ -1390,12 +1709,15 @@ let elapsed = 0;
   cam.lookAt(0, currentLookY, 0);
 
   if (bottle) {
-    // Houle traverse + drift cocktails — lerp fluide vers les cibles
+    // Houle traverse — animation temporelle (oscillation naturelle quand dans la section)
+    if (traverseRocking) {
+      // Deux sinus déphasés pour effet organique : tilt Z et houle Y indépendants
+      sectionState.targetTiltZ = Math.sin(elapsed * 0.9) * 0.13; // roulis lent
+      traverseHouleTarget      = Math.sin(elapsed * 0.55 + 1.2) * 0.09; // tangage décalé
+    }
     sectionState.traverseHoule  = (sectionState.traverseHoule  || 0);
-    sectionState.traverseHoule += (traverseHouleTarget - sectionState.traverseHoule) * 0.05;
-    sectionState.cocktailsY     = (sectionState.cocktailsY     || 0);
-    sectionState.cocktailsY    += (cocktailsYTarget    - sectionState.cocktailsY)    * 0.05;
-    const floatY = scrollState.posY + Math.sin(elapsed * 0.65) * 0.045 + sectionState.traverseHoule + sectionState.cocktailsY;
+    sectionState.traverseHoule += (traverseHouleTarget - sectionState.traverseHoule) * 0.04;
+    const floatY = scrollState.posY + Math.sin(elapsed * 0.65) * 0.045 + sectionState.traverseHoule;
     // Décalage latéral et inclinaison par section (lerp fluide)
     sectionState.currentX     += (sectionState.targetX     - sectionState.currentX)     * 0.10;
     sectionState.currentTiltZ += (sectionState.targetTiltZ - sectionState.currentTiltZ) * 0.10;
@@ -1409,10 +1731,11 @@ let elapsed = 0;
     } else {
       bottle.rotation.y = scrollState.rotY + finalRotExtra + (originsState.active ? 0 : mouseTiltY);
     }
-    bottle.rotation.x += (mouseTiltX - bottle.rotation.x) * 0.05;
-    bottle.rotation.z += (sectionState.currentTiltZ - bottle.rotation.z) * 0.06;
-    // Opacité bouteille — eclipse final + fondu quand on est à l'intérieur
-    const effectiveOpacity = sectionState.bottleOpacity * (1 - originsState.insideGlass);
+    bottle.rotation.x = 0;
+    bottle.rotation.z = 0;
+    // Opacité bouteille — eclipse final + fondu intérieur + masquage traverse
+    traverseBottleHide += (traverseBottleHideTgt - traverseBottleHide) * 0.05;
+    const effectiveOpacity = sectionState.bottleOpacity * (1 - originsState.insideGlass) * (1 - traverseBottleHide);
     bottle.traverse(c => {
       if (c.isMesh) {
         const mats = Array.isArray(c.material) ? c.material : [c.material];
@@ -1426,9 +1749,9 @@ let elapsed = 0;
       barbadosDisc.position.y = floatY - 1.35;
       barbadosDisc.position.z = 0;
       barbadosDisc.rotation.x = -Math.PI / 2;
-      barbadosDisc.rotation.z = elapsed * 0.12;
+      barbadosDisc.rotation.z = 0;
       barbadosDisc.scale.setScalar(1 + originsState.insideGlass * 1.8);
-      barbadosDisc.material.opacity = originsState.discOpacity;
+      barbadosDisc.material.opacity += (originsState.discOpacity - barbadosDisc.material.opacity) * 0.06;
     }
     // Lumière intérieure ambrée
     if (interiorLight) {
@@ -1437,16 +1760,14 @@ let elapsed = 0;
     }
     // Anneau de réfraction au col
     if (glassRing) {
-      const gf = originsState.glassFlash;
-      glassRing.position.y = floatY + 1.18;
-      glassRing.scale.setScalar(1 + gf * 5);
-      glassRing.material.opacity = gf;
+      glassRing.material.opacity = 0;
     }
   }
 
   // Glass overlays
   if (glassEntryEl) glassEntryEl.style.opacity = originsState.insideGlass * 0.8;
-  if (glassFlashEl) glassFlashEl.style.opacity = originsState.glassFlash * 0.65;
+  if (glassFlashEl) glassFlashEl.style.opacity = 0;
+
 
   renderer.render(scene, cam);
 })();
@@ -1456,6 +1777,9 @@ window.addEventListener('mousemove', e => {
   mouseNX = (e.clientX / window.innerWidth  - 0.5) * 2;
   mouseNY = (e.clientY / window.innerHeight - 0.5) * 2;
 });
+
+// Recalcul de toutes les positions après les pins (traverse + heritage)
+ScrollTrigger.refresh();
 
 // ─── RESIZE ───────────────────────────────────────────
 window.addEventListener('resize', () => {
