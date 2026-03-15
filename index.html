@@ -493,6 +493,7 @@
 
     /* ─── TRAVERSE ──────────────────────────────────────── */
     #traverse { padding: 10rem 0; position: relative; }
+    .traverse-map-mobile { display: none; }
     .traverse-map {
       position: absolute; top: 0; bottom: 0; left: -5%;
       width: 78%; height: 100%;
@@ -734,6 +735,133 @@
       font-size: 0.55rem; letter-spacing: 0.2em;
       text-transform: uppercase; opacity: 0.2;
     }
+
+  /* ═══════════════════════════════════════════════════
+     MOBILE — ≤ 768px
+  ═══════════════════════════════════════════════════ */
+  @media (max-width: 768px) {
+
+    /* ── Variables ─────────────────────────────── */
+    :root { --nav-h: 4rem; }
+
+    /* ── Section padding ───────────────────────── */
+    .section-inner { padding: 0 1.4rem; }
+    .section-hr { left: 1.4rem; right: 1.4rem; }
+
+    /* ── NAV ───────────────────────────────────── */
+    nav { padding: 0 1.4rem; }
+    .nav-links { display: none; }
+
+    /* ── HERO ──────────────────────────────────── */
+    .hero-eclipse-title {
+      font-size: clamp(4.5rem, 28vw, 8rem);
+      white-space: nowrap;
+    }
+    .hero-eclipse-sub {
+      font-size: 0.52rem;
+      letter-spacing: 0.28em;
+      white-space: normal;
+      text-align: center;
+      width: 90%;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 5rem;
+    }
+    .hero-top-left {
+      left: 1.4rem;
+      top: calc(var(--nav-h) + 1rem);
+    }
+    .scroll-indicator { right: 1.4rem; }
+
+    /* ── ECLIPSE HERO ──────────────────────────── */
+    .ehb-sun  { width: min(320px, 88vw); height: min(320px, 88vw); }
+    .ehb-moon { width: min(240px, 70vw); height: min(240px, 70vw); }
+    .ehb-corona { width: min(250px, 73vw); height: min(250px, 73vw); }
+
+    /* ── CANE ──────────────────────────────────── */
+    #cane { padding: 5rem 0; }
+    .cane-stats { gap: 2.2rem; flex-wrap: wrap; }
+    .cane-body { max-width: 100%; }
+
+    /* ── PRODUCT ───────────────────────────────── */
+    #product .section-inner {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding: 5rem 1.4rem;
+    }
+    .product-title { font-size: clamp(3.5rem, 20vw, 6rem); }
+    .tasting-grid  { grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+
+    /* ── ORIGINS ───────────────────────────────── */
+    #origins { padding: 5rem 0; }
+    .origins-title { font-size: clamp(3.5rem, 22vw, 7rem); }
+    .origins-meta  { flex-direction: column; gap: 1.5rem; margin-top: 1.5rem; }
+    .origins-body  { max-width: 100%; }
+
+    /* ── TRAVERSE ──────────────────────────────── */
+    #traverse {
+      padding: 0;
+      flex-direction: column;
+      align-items: stretch;
+      overflow: visible;
+      min-height: unset;
+    }
+    /* cache le SVG desktop */
+    .traverse-map { display: none !important; }
+    /* SVG portrait mobile */
+    .traverse-map-mobile {
+      display: block !important;
+      width: 100vw !important;
+      height: 52svh !important;
+      opacity: 1 !important;
+      pointer-events: none;
+    }
+    #traverse .section-inner { padding: 1.2rem 1.4rem 0.8rem; order: -1; }
+    .traverse-inner {
+      align-items: flex-start;
+      text-align: left;
+    }
+    .traverse-quote { font-size: clamp(1rem, 4vw, 1.5rem); max-width: 100%; line-height: 1.5; }
+    .traverse-meta  { gap: 0.8rem; flex-wrap: wrap; margin-top: 0.8rem; }
+    .traverse-rule  { margin: 0.8rem 0; }
+    .traverse-label { margin-bottom: 0.6rem; }
+
+    /* ── HERITAGE ──────────────────────────────── */
+    #heritage { padding: 5rem 0; }
+    .hc-year  { font-size: clamp(6rem, 28vw, 10rem); }
+    .heritage-year { font-size: clamp(4rem, 24vw, 8rem); text-align: center; width: 100%; }
+    .heritage-body { max-width: 100%; }
+    .heritage-timeline { display: none !important; }
+    .heritage-countdown { align-items: center; text-align: center; padding-bottom: 0; }
+    .hc-sub { text-align: center; }
+    #heritage { text-align: center; }
+
+    /* ── PROCESS ───────────────────────────────── */
+    #process { height: 100svh; }
+    .pcard { padding: 0 1.8rem; }
+    .pcard-bnum { font-size: clamp(10rem, 40vw, 18rem); }
+    .pcard-name { font-size: clamp(3rem, 14vw, 6rem); margin-bottom: 1.2rem; }
+    .pcard-desc { font-size: 0.82rem; }
+    .process-pin-title { font-size: clamp(1.8rem, 8vw, 3rem); }
+
+    /* ── ECLIPSE FINAL ─────────────────────────── */
+    .eclipse-sun  { width: min(280px, 84vw); height: min(280px, 84vw); }
+    .eclipse-moon { width: min(220px, 66vw); height: min(220px, 66vw); }
+    .eclipse-corona { width: min(232px, 70vw); height: min(232px, 70vw); }
+    .eclipse-content { margin-top: min(200px, 52vw); }
+    .eclipse-title-final { font-size: clamp(3.5rem, 20vw, 7rem); }
+
+    /* ── LOADER ────────────────────────────────── */
+    #loader { padding: 2rem 1.8rem; }
+
+    /* ── FOOTER ────────────────────────────────── */
+    .footer-top {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+    footer { padding: 3rem 1.4rem 1.5rem; }
+  }
   </style>
 </head>
 <body>
@@ -927,6 +1055,60 @@
       <line x1="16" y1="-16" x2="-16" y2="16"/>
       <circle cx="0" cy="0" r="8"/>
       <polygon points="0,-22 -4,-10 0,-14 4,-10" fill="#c9a84c" opacity="0.35"/>
+    </g>
+  </svg>
+
+  <!-- SVG portrait — mobile uniquement -->
+  <svg class="traverse-map-mobile" id="traverse-map-mobile" viewBox="0 0 390 600" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="routeGlowM" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="4" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <!-- Grille -->
+    <g stroke="#c9a84c" stroke-width="0.5" opacity="0.08">
+      <line x1="0" y1="150" x2="390" y2="150"/>
+      <line x1="0" y1="300" x2="390" y2="300"/>
+      <line x1="0" y1="450" x2="390" y2="450"/>
+      <line x1="130" y1="0" x2="130" y2="600"/>
+      <line x1="260" y1="0" x2="260" y2="600"/>
+    </g>
+    <!-- Côte est Amérique + Caraïbes (gauche bas) -->
+    <path d="M 30,580 C 45,540 55,500 60,460 C 65,420 68,380 72,340 C 76,300 82,265 88,235" stroke="#c9a84c" stroke-width="1.5" fill="none" opacity="0.22"/>
+    <!-- Îles Caraïbes -->
+    <g fill="#c9a84c" opacity="0.30">
+      <ellipse cx="72" cy="490" rx="6" ry="3"/>
+      <ellipse cx="85" cy="500" rx="5" ry="3"/>
+      <ellipse cx="95" cy="494" rx="7" ry="3"/>
+    </g>
+    <!-- Côte ouest Europe (droite haut) -->
+    <path d="M 302,20 C 310,55 318,95 314,135 C 310,165 305,185 310,205 C 315,222 325,230 322,248 C 318,265 308,272 312,285" stroke="#c9a84c" stroke-width="1.5" fill="none" opacity="0.22"/>
+    <!-- Côte nord-ouest Afrique -->
+    <path d="M 312,285 C 322,310 335,340 345,375 C 355,405 362,440 368,480" stroke="#c9a84c" stroke-width="1.5" fill="none" opacity="0.18"/>
+    <!-- Route maritime Barbade → Bordeaux (diagonal) -->
+    <path id="traverse-route-mobile"
+      d="M 88,490 C 130,430 175,350 220,270 C 260,200 285,160 310,130"
+      stroke="#c9a84c" stroke-width="2.5" fill="none" stroke-linecap="round"
+      filter="url(#routeGlowM)" opacity="0.85"/>
+    <!-- Marqueur départ — Barbade -->
+    <circle cx="88" cy="490" r="5" fill="#c9a84c" opacity="0.9"/>
+    <circle cx="88" cy="490" r="10" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.45"/>
+    <!-- Marqueur arrivée — Bordeaux -->
+    <circle id="traverse-dest-m" cx="310" cy="130" r="5" fill="#c9a84c" opacity="0"/>
+    <circle id="traverse-dest-ring-m" cx="310" cy="130" r="10" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0"/>
+    <!-- Labels -->
+    <text x="88" y="518" font-family="'Cormorant Garamond', serif" font-size="11" fill="#c9a84c" opacity="0.55" letter-spacing="2" text-anchor="middle">BARBADE</text>
+    <text x="310" y="115" font-family="'Cormorant Garamond', serif" font-size="11" fill="#c9a84c" opacity="0" id="traverse-label-dest-m" letter-spacing="2" text-anchor="middle">BORDEAUX</text>
+    <text x="195" y="310" font-family="'Cormorant Garamond', serif" font-size="14" font-style="italic" fill="#c9a84c" opacity="0.10" letter-spacing="3" text-anchor="middle">ATLANTIQUE</text>
+    <!-- Rose des vents -->
+    <g transform="translate(195,390)" stroke="#c9a84c" stroke-width="1" opacity="0.18" fill="none">
+      <line x1="0" y1="-18" x2="0" y2="18"/>
+      <line x1="-18" y1="0" x2="18" y2="0"/>
+      <line x1="-12" y1="-12" x2="12" y2="12"/>
+      <line x1="12" y1="-12" x2="-12" y2="12"/>
+      <circle cx="0" cy="0" r="7"/>
+      <polygon points="0,-18 -3,-8 0,-12 3,-8" fill="#c9a84c" opacity="0.35"/>
     </g>
   </svg>
 
@@ -1145,8 +1327,9 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.4;
 
 const scene = new THREE.Scene();
+const isMob = () => window.innerWidth <= 768;
 const cam = new THREE.PerspectiveCamera(40, W() / H(), 0.1, 100);
-cam.position.set(0, 0, 5);
+cam.position.set(0, 0, isMob() ? 11 : 5);
 
 // Background shader
 const bgMat = new THREE.ShaderMaterial({
@@ -1225,7 +1408,7 @@ let bottle = null;
 let barbadosDisc = null;
 const clock = new THREE.Clock();
 const scrollState = { rotY: 0, posY: 0 };
-const originsState = { active: false, camX: 0, camY: 0, camZ: 5, lookTargetY: 0, discOpacity: 0, insideGlass: 0, glassFlash: 0 };
+const originsState = { active: false, camX: 0, camY: 0, camZ: isMob() ? 11 : 5, lookTargetY: 0, discOpacity: 0, insideGlass: 0, glassFlash: 0 };
 const overlayEl    = document.getElementById('barbados-overlay');
 const glassEntryEl = document.getElementById('glass-entry');
 const glassFlashEl = document.getElementById('glass-flash');
@@ -1380,7 +1563,7 @@ ScrollTrigger.create({
   },
   onLeave: () => {
     originsState.active = false;
-    originsState.camX = 0; originsState.camY = 0; originsState.camZ = 5;
+    originsState.camX = 0; originsState.camY = 0; originsState.camZ = isMob() ? 11 : 5;
     originsState.lookTargetY = 0; originsState.discOpacity = 0;
     originsState.insideGlass = 0; originsState.glassFlash = 0;
     traverseBottleHideTgt = 1;
@@ -1388,7 +1571,7 @@ ScrollTrigger.create({
   },
   onLeaveBack: () => {
     originsState.active = false;
-    originsState.camX = 0; originsState.camY = 0; originsState.camZ = 5;
+    originsState.camX = 0; originsState.camY = 0; originsState.camZ = isMob() ? 11 : 5;
     originsState.lookTargetY = 0; originsState.discOpacity = 0;
     originsState.insideGlass = 0; originsState.glassFlash = 0;
     traverseBottleHideTgt = 0; // remonte vers Product/Hero → bouteille réapparaît
@@ -1471,10 +1654,11 @@ gsap.timeline({ scrollTrigger: { trigger: '#traverse', start: 'top 65%', end: 't
 [
   { id: '#cane',      x:  1.10, tz:  0.00 },
   { id: '#product',   x: -0.80, tz:  0.00 },
-  { id: '#traverse',  x: -0.30, tz:  0.000 }, // bouteille centrée sur le voilier SVG
+  { id: '#traverse',  x: -0.30, tz:  0.000 },
   { id: '#heritage',  x:  0.80, tz:  0.00 },
   { id: '#process',   x:  0.48, tz: -0.03 },
 ].forEach(({ id, x, tz }) => {
+  if (isMob()) { x = 0; tz = 0; }
   gsap.timeline({
     scrollTrigger: { trigger: id, start: 'top 65%', end: 'bottom 35%', scrub: 1.0 }
   })
@@ -1531,7 +1715,14 @@ ScrollTrigger.create({
 
 // Traverse — pin + route maritime + masquage bouteille
 (function initTraversePin() {
-  const routeEl = document.getElementById('traverse-route');
+  const mobile    = isMob();
+  const routeId   = mobile ? 'traverse-route-mobile' : 'traverse-route';
+  const mapId     = mobile ? 'traverse-map-mobile'   : 'traverse-map';
+  const destIds   = mobile
+    ? ['#traverse-dest-m', '#traverse-dest-ring-m', '#traverse-label-dest-m']
+    : ['#traverse-dest',   '#traverse-dest-ring',   '#traverse-label-dest'];
+
+  const routeEl = document.getElementById(routeId);
   if (!routeEl) return;
   const len = routeEl.getTotalLength();
   routeEl.style.strokeDasharray = len;
@@ -1545,17 +1736,16 @@ ScrollTrigger.create({
       pin: true,
       scrub: 1.5,
       onEnter:     () => { traverseRocking = true;  traverseBottleHideTgt = 1; },
-      onLeave:     () => { traverseRocking = false; traverseBottleHideTgt = 1; sectionState.targetTiltZ = 0; traverseHouleTarget = 0; }, // → Heritage : reste cachée
+      onLeave:     () => { traverseRocking = false; traverseBottleHideTgt = 1; sectionState.targetTiltZ = 0; traverseHouleTarget = 0; },
       onEnterBack: () => { traverseRocking = true;  traverseBottleHideTgt = 1; },
-      onLeaveBack: () => { traverseRocking = false; traverseBottleHideTgt = 1; sectionState.targetTiltZ = 0; traverseHouleTarget = 0; }, // ← Origins : reste cachée
+      onLeaveBack: () => { traverseRocking = false; traverseBottleHideTgt = 1; sectionState.targetTiltZ = 0; traverseHouleTarget = 0; },
     }
   })
-  .to('#traverse-map', { opacity: 1, ease: 'none', duration: 0.18 })
+  .to('#' + mapId, { opacity: 1, ease: 'none', duration: 0.18 })
   .to(routeEl, { strokeDashoffset: 0, ease: 'none', duration: 0.58 }, 0.15)
-  .to(['#traverse-dest', '#traverse-dest-ring', '#traverse-label-dest'], { opacity: 0.9, ease: 'none', duration: 0.08 }, 0.75)
-  .to({}, { duration: 0.08 })                                                 // pause — route complète visible
-  .to(['#traverse-map', '#traverse-dest', '#traverse-dest-ring', '#traverse-label-dest'],
-      { opacity: 0, ease: 'power2.in', duration: 0.15 });                    // fondu disparition
+  .to(destIds, { opacity: 0.9, ease: 'none', duration: 0.08 }, 0.75)
+  .to({}, { duration: 0.08 })
+  .to(['#' + mapId, ...destIds], { opacity: 0, ease: 'power2.in', duration: 0.15 });
 })();
 
 // Heritage — pin + visuel (feature flag HERITAGE_VISUAL)
